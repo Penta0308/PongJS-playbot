@@ -1,6 +1,6 @@
 // 0-based (map) indexing
 
-const block_colors = ["#000000"]
+const block_colors = ["#000000", "#111111"]
 
 change_speed(-1);
 
@@ -94,14 +94,43 @@ function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
 }
 
 class racket {
+	constructor(x, color) {
+		this.x = x;
+		this.y = round(get_max_y() / 2.0);
+		this.l = 1; // 길이: 1 + 2 * l
+		this.color = color;
+		this.cmap = new Array(get_max_y() + 1);
+		this.cmap.fill("#FFFFFF");
+		this.moving = false; // 뮤텍스
+	}
 	incr() {
+		if(this.moving) return;
+		this.moving = true;
+		if(this.y + this.l != get_max_y()) {
+			this.y += 1;
+			this.cmap[this.y + this.l] = get_color(this.y + this.l, this.x);
+			set_color(this.y + this.l, this.x, this.color);
+			set_color(this.y - this.l, this.x, this.cmap[this.y - this.l]);
+		}
+		this.moving = false;
+		//print("RkIc " + this.y);
 	}
 	decr() {
+		if(this.moving) return;
+		this.moving = true;
+		if(this.y - this.l != 0) {
+			this.y -= 1;
+			this.cmap[this.y - this.l] = get_color(this.y - this.l, this.x);
+			set_color(this.y - this.l, this.x, this.color);
+			set_color(this.y + this.l, this.x, this.cmap[this.y + this.l]);
+		}
+		this.moving = false;
+		//print("RkDc " + this.y);
 	}
 }
 
-rk1 = new racket();
-rk2 = new racket();
+rk1 = new racket(1, "#000000");
+rk2 = new racket(get_max_x() - 1, "#111111");
 
 function roll(crashwall, crashblock) {
 	const contdrag = -0.005;
