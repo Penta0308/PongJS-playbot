@@ -138,21 +138,27 @@ class pong {
 		this.crashwall = crashwall;
 		this.crashblock = crashblock;
 		this.contdrag = -0.005;
-		this.c = 0;
+		this.init();
 	}
 	init() {
 		var initangle = Math.random() * 2 * Math.PI;
 		var initv = 1.0;
-		this.ball["p"][0] = parseFloat(get_x());
-		this.ball["p"][1] = parseFloat(get_y());
+		this.ball["p"][0] = get_max_x() / 2.0;
+		this.ball["p"][1] = get_max_y() / 2.0;
 		this.ball["v"][0] = initv * Math.cos(initangle);
 		this.ball["v"][1] = initv * Math.sin(initangle);
+		space_jump(round(this.ball["p"][1]), round(this.ball["p"][0]))
 		print("Init " + this.ball["v"]);
 		this.c = 0;
+		this.brk = false;
 	}
 	roll() {
+		if(this.c != 0 && this.brk) this.init();
 		while(true) {
-			if(this.step() != 0) break;
+			if(this.step() != 0) {
+				this.brk = true;
+				break;
+			}
 			this.c += 1;
 		}
 	}
@@ -180,7 +186,7 @@ class pong {
 			crashdir += +3;
 		}
 		if(crashdir != 5) {
-			if(this.crashwall(this.ball, crashdir) != 0) break;
+			if(this.crashwall(this.ball, crashdir) != 0) return 3;
 		}
 
 		if(block_colors.includes(get_color(round(ty), round(tx)))) { // get_color 함수 인자의 X와 Y가 바뀌어 있더이다
@@ -212,7 +218,7 @@ class pong {
 					else if(round(ty) < get_y()) crashdir = 7;
 				}
 			}
-			if(this.crashblock(this.ball, crashdir) != 0) break;
+			if(this.crashblock(this.ball, crashdir) != 0) return 2;
 		}
 
 		this.ball["p"][0] = tx;
