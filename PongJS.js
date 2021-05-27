@@ -66,7 +66,7 @@ function domove(c, v) {
 		b = "0".repeat(2 - b.length) + b;
 	if(get_color() != "#000000")
 		set_color("#" + r + g + b);
-	print("Vel  " + s + " v " + v);
+	//print("Vel  " + s + " v " + v);
 	move();
 	clear_move();
 }
@@ -86,7 +86,7 @@ function crashwall(ball) {
 	print("CrsW " + ball["p"]);
 }
 function crashblock(ball, crashdir) {
-	print("CrsB " + ball["p"]);
+	print("CrsB " + ball["p"] + " " + crashdir);
 }
 
 function roll(crashwall, crashblock) {
@@ -103,8 +103,6 @@ function roll(crashwall, crashblock) {
 	while(true) {
 		var tx = ball["p"][0] + ball["v"][0];
 		var ty = ball["p"][1] + ball["v"][1];
-		//var nx = get_x();
-		//var ny = get_y();
 		var vt = Math.sqrt(ball["v"][0]*ball["v"][0] + ball["v"][1]*ball["v"][1]);
 		var wallcrash = false;
 		if(round(tx) > get_max_x()) {
@@ -156,6 +154,7 @@ function roll(crashwall, crashblock) {
 					else if(round(ty) < get_y()) crashdir = 7;
 				}
 			}
+			crashblock(ball, crashdir);
 		}
 		
 		ball["p"][0] = tx;// + ball["v"][0]
