@@ -83,8 +83,10 @@ function set_direction(d) {
 function crashwall(ball, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
+		print("Right Win");
 		return 1;
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
+		print("Left  Win");
 		return 2;
 	} else return 0;
 }
