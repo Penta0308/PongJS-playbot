@@ -83,10 +83,8 @@ function set_direction(d) {
 function crashwall(ball, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
-		print("Right Win");
 		return 1;
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
-		print("Left  Win");
 		return 2;
 	} else return 0;
 }
@@ -94,6 +92,16 @@ function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
 	print("CrsB " + ball["p"] + " " + crashdir);
 	return 0;
 }
+
+class racket {
+	incr() {
+	}
+	decr() {
+	}
+}
+
+rk1 = new racket();
+rk2 = new racket();
 
 function roll(crashwall, crashblock) {
 	const contdrag = -0.005;
@@ -198,4 +206,9 @@ function roll(crashwall, crashblock) {
 }
 
 press_key("space", "roll(crashwall, crashblock)")
+press_key("w", "rk1.incr()")
+press_key("s", "rk1.decr()")
+press_key("i", "rk2.incr()")
+press_key("j", "rk2.decr()")
+
 print("PRESS space TO CONTINUE")
