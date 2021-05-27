@@ -182,7 +182,7 @@ function roll(crashwall, crashblock) {
 		}
 		
 		if(vt <= 0.0) {
-			print("Brk  " + ball["v"]);
+			print("Brk  " + ball["p"]);
 			break;
 		}
 		
