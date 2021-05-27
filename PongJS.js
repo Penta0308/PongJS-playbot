@@ -82,9 +82,15 @@ function set_direction(d) {
 
 function crashwall(ball, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + ball["p"] + " " + crashdir);
+	if([1, 4, 7].includes(crashdir)) { // 우측 승
+		return 1;
+	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
+		return 2;
+	} else return 0;
 }
 function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
 	print("CrsB " + ball["p"] + " " + crashdir);
+	return 0;
 }
 
 function roll(crashwall, crashblock) {
@@ -121,7 +127,9 @@ function roll(crashwall, crashblock) {
 			ball["v"][1] *= -1;
 			crashdir += +3;
 		}
-		if(crashdir != 5) crashwall(ball, crashdir);
+		if(crashdir != 5) {
+			if(crashwall(ball, crashdir) != 0) break;
+		}
 		
 		if(block_colors.includes(get_color(round(ty), round(tx)))) { // get_color 함수 인자의 X와 Y가 바뀌어 있더이다
 			var crashdir = 5
@@ -152,7 +160,7 @@ function roll(crashwall, crashblock) {
 					else if(round(ty) < get_y()) crashdir = 7;
 				}
 			}
-			crashblock(ball, crashdir);
+			if(crashblock(ball, crashdir) != 0) break;
 		}
 		
 		ball["p"][0] = tx;
