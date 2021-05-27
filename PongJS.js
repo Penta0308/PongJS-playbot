@@ -1,13 +1,16 @@
-// 0-based indexing
+// 0-based (map) indexing
+
+const block_colors = ["#000000"]
 
 change_speed(-1);
 
-
-set_color(10, 9, "#000000"); // y, x
-set_color(11, 9, "#000000"); // y, x
-set_color(12, 9, "#000000"); // y, x
-set_color(13, 9, "#000000"); // y, x
-
+// FROM HERE
+set_color(10, 9, block_colors[0]); // y, x
+set_color(11, 9, block_colors[0]); // y, x
+set_color(12, 9, block_colors[0]); // y, x
+set_color(13, 9, block_colors[0]); // y, x
+// TO HERE
+// 테스트용 벽 만들기 코드
 
 // FROM HERE
 /**
@@ -125,22 +128,22 @@ function roll(crashwall, crashblock) {
 		}
 		if(wallcrash) crashwall(ball);
 		
-		if(get_color(round(ty), round(tx)) == "#000000") { // X와 Y가 반대이더이다
+		if(block_colors.includes(get_color(round(ty), round(tx)))) { // X와 Y가 반대이더이다
 			var crashdir = 5
-			if(ball["v"][0] < 0.0 && get_color(get_y(), get_x() - 1) == "#000000") {
+			if(ball["v"][0] < 0.0 && block_colors.includes(get_color(get_y(), get_x() - 1))) {
 				tx = 2.0 * get_x() - tx;
 				ball["v"][0] *= -1;
 				crashdir += -1;
-			} else if(ball["v"][0] > 0.0 && get_color(get_y(), get_x() + 1) == "#000000") {
+			} else if(ball["v"][0] > 0.0 && block_colors.includes(get_color(get_y(), get_x() + 1))) {
 				tx = 2.0 * get_x() - tx;
 				ball["v"][0] *= -1;
 				crashdir += +1;
 			}
-			if(ball["v"][1] < 0.0 && get_color(get_y() - 1, get_x()) == "#000000") {
+			if(ball["v"][1] < 0.0 && block_colors.includes(get_color(get_y() - 1, get_x()))) {
 				ty = 2.0 * get_y() - ty;
 				ball["v"][1] *= -1;
 				crashdir += +3;
-			} else if(ball["v"][1] > 0.0 && get_color(get_y() + 1, get_x()) == "#000000") {
+			} else if(ball["v"][1] > 0.0 && block_colors.includes(get_color(get_y() + 1, get_x()))) {
 				ty = 2.0 * get_y() - ty;
 				ball["v"][1] *= -1;
 				crashdir += -3;
