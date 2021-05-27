@@ -12,6 +12,7 @@ set_color(13, 9, block_colors[0]); // y, x
 // TO HERE
 // 테스트용 벽 만들기 코드
 
+
 // FROM HERE
 /**
  * Converts an HSV color value to RGB. Conversion formula
@@ -47,6 +48,8 @@ function hsvToRgb(h, s, v) {
 // TO HERE
 // https://gist.github.com/mjackson/5311256#file-color-conversion-algorithms-js-L101 Line 108
 
+
+
 // FROM HERE
 // (c) 2021 Penta0308
 
@@ -61,34 +64,26 @@ function domove(c, v) {
 	var r = (round(color[0])).toString(16);
 	var g = (round(color[1])).toString(16);
 	var b = (round(color[2])).toString(16);
-	if(r.length != 2)
-		r = "0".repeat(2 - r.length) + r;
-	if(g.length != 2)
-		g = "0".repeat(2 - g.length) + g;
-	if(b.length != 2)
-		b = "0".repeat(2 - b.length) + b;
-	if(get_color() != "#000000")
-		set_color("#" + r + g + b);
+	if(r.length != 2) r = "0".repeat(2 - r.length) + r;
+	if(g.length != 2) g = "0".repeat(2 - g.length) + g;
+	if(b.length != 2) b = "0".repeat(2 - b.length) + b;
+	if(get_color() != "#000000") set_color("#" + r + g + b);
 	//print("Vel  " + s + " v " + v);
 	move();
 	clear_move();
 }
 
 function set_direction(d) {
-	if(d == 'l')
-		repeat("turn_left()", (6 - get_direction()) % 4);
-	else if(d == 'r')
-		repeat("turn_left()", (4 - get_direction()) % 4);
-	else if(d == 'u')
-		repeat("turn_left()", (5 - get_direction()) % 4);
-	else if(d == 'd')
-		repeat("turn_left()", (7 - get_direction()) % 4);
+	if(d == 'l')      repeat("turn_left()", (6 - get_direction()) % 4);
+	else if(d == 'r') repeat("turn_left()", (4 - get_direction()) % 4);
+	else if(d == 'u') repeat("turn_left()", (5 - get_direction()) % 4);
+	else if(d == 'd') repeat("turn_left()", (7 - get_direction()) % 4);
 }
 
-function crashwall(ball) {
-	print("CrsW " + ball["p"]);
+function crashwall(ball, crashdir) { // 벽 충돌 Event Function
+	print("CrsW " + ball["p"] + " " + crashdir);
 }
-function crashblock(ball, crashdir) {
+function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
 	print("CrsB " + ball["p"] + " " + crashdir);
 }
 
@@ -107,28 +102,28 @@ function roll(crashwall, crashblock) {
 		var tx = ball["p"][0] + ball["v"][0];
 		var ty = ball["p"][1] + ball["v"][1];
 		var vt = Math.sqrt(ball["v"][0]*ball["v"][0] + ball["v"][1]*ball["v"][1]);
-		var wallcrash = false;
-		if(round(tx) > get_max_x()) {
+		var crashdir = 5;
+		if(tx > get_max_x()) {
 			tx = 2.0 * get_max_x() - tx;
 			ball["v"][0] *= -1;
-			wallcrash = true;
-		} else if(round(tx) < 0) {
+			crashdir += +1;
+		} else if(tx < 0.0) {
 			tx = -tx;
 			ball["v"][0] *= -1;
-			wallcrash = true;
+			crashdir += -1;
 		}
-		if(round(ty) > get_max_y()) {
+		if(ty > get_max_y()) {
 			ty = 2.0 * get_max_y() - ty;
 			ball["v"][1] *= -1;
-			wallcrash = true;
-		} else if(round(ty) < 0) {
+			crashdir += -3;
+		} else if(ty < 0.0) {
 			ty = -ty;
 			ball["v"][1] *= -1;
-			wallcrash = true;
+			crashdir += +3;
 		}
-		if(wallcrash) crashwall(ball);
+		if(crashdir != 5) crashwall(ball, crashdir);
 		
-		if(block_colors.includes(get_color(round(ty), round(tx)))) { // X와 Y가 반대이더이다
+		if(block_colors.includes(get_color(round(ty), round(tx)))) { // get_color 함수 인자의 X와 Y가 바뀌어 있더이다
 			var crashdir = 5
 			if(ball["v"][0] < 0.0 && block_colors.includes(get_color(get_y(), get_x() - 1))) {
 				tx = 2.0 * get_x() - tx;
@@ -160,9 +155,8 @@ function roll(crashwall, crashblock) {
 			crashblock(ball, crashdir);
 		}
 		
-		ball["p"][0] = tx;// + ball["v"][0]
-		ball["p"][1] = ty;// + ball["v"][1]
-		// 이동
+		ball["p"][0] = tx;
+		ball["p"][1] = ty;
 		
 		tx = round(tx);
 		ty = round(ty);
@@ -182,15 +176,16 @@ function roll(crashwall, crashblock) {
 		}
 		
 		if(vt <= 0.0) {
-			print("Brk  " + ball["p"]);
+			print("Stop " + ball["p"]);
 			break;
 		}
 		
 		ball["v"][0] *= Math.max((vt + contdrag) / vt, 0.0);
-		ball["v"][1] *= Math.max((vt + contdrag) / vt, 0.0);
-		// 항력 계산
+		ball["v"][1] *= Math.max((vt + contdrag) / vt, 0.0); // 속도에 상관없이 일정한 감속을 부여: 수정 필요함
+		
 		c += 1;
 	}
 }
 
 press_key("space", "roll(crashwall, crashblock)")
+print("PRESS space TO CONTINUE")
