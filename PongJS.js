@@ -142,6 +142,7 @@ class pong {
 		//this.contdrag = -0.005;
 		this.contdrag = 0.0;
 		this.init();
+		//this.loopid = undefined;
 	}
 	init() {
 		var initangle = Math.random() * 2 * Math.PI;
@@ -153,19 +154,22 @@ class pong {
 		space_jump(round(this.ball["p"][1]), round(this.ball["p"][0]))
 		print("Init " + this.ball["v"]);
 		this.c = 0;
-		this.brk = false;
 	}
 	roll() {
-		print(this.brk);
 		if(this.c != 0 && this.brk == true) this.init();
-		setInterval(this.rep, 1)
+		//this.loopid = setInterval(this.rep, 1)
+		while(this.rep()) {}
 	}
 	rep() {
-		if(this.step() > 0) {
-			this.brk = true;
-			break;
-		}
+		print("REP");
+		var i = this.step();
 		this.c += 1;
+		if(i > 0) {
+			print("CLRR");
+			//clearInterval(this.loopid);
+			//this.loopid = undefined;
+			return false;
+		} else return true;
 	}
 	step() {
 		var tx = this.ball["p"][0] + this.ball["v"][0];
