@@ -67,7 +67,7 @@ function domove(c, v) {
 	if(r.length != 2) r = "0".repeat(2 - r.length) + r;
 	if(g.length != 2) g = "0".repeat(2 - g.length) + g;
 	if(b.length != 2) b = "0".repeat(2 - b.length) + b;
-	if(get_color() != "#000000") set_color("#" + r + g + b);
+	if(!block_colors.includes(get_color()) set_color("#" + r + g + b);
 	//print("Vel  " + s + " v " + v);
 	move();
 	clear_move();
