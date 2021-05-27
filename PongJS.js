@@ -53,7 +53,7 @@ function hsvToRgb(h, s, v) {
 // FROM HERE
 // (c) 2021 Penta0308
 
-function domove(c, v) {
+function domove(x, y, c, v) {
 	var s = round((1 - v) * 5);
 	change_speed(0);
 	for(i = 0; i < s; i++)
@@ -67,9 +67,9 @@ function domove(c, v) {
 	if(r.length != 2) r = "0".repeat(2 - r.length) + r;
 	if(g.length != 2) g = "0".repeat(2 - g.length) + g;
 	if(b.length != 2) b = "0".repeat(2 - b.length) + b;
-	if(!block_colors.includes(get_color())) set_color("#" + r + g + b);
+	if(!block_colors.includes(get_color(get_y(), get_x()))) set_color("#" + r + g + b);
 	//print("Vel  " + s + " v " + v);
-	move();
+	space_jump(y, x);
 	clear_move();
 }
 
@@ -113,7 +113,7 @@ class racket {
 			set_color(this.y - this.l, this.x, this.cmap[this.y - this.l]);
 		}
 		this.moving = false;
-		//print("RkIc " + this.y);
+		print("RkIc " + this.y);
 	}
 	decr() {
 		if(this.moving) return;
@@ -125,69 +125,82 @@ class racket {
 			set_color(this.y + this.l, this.x, this.cmap[this.y + this.l]);
 		}
 		this.moving = false;
-		//print("RkDc " + this.y);
+		print("RkDc " + this.y);
 	}
 }
 
 rk1 = new racket(1, "#000000");
 rk2 = new racket(get_max_x() - 1, "#111111");
 
-function roll(crashwall, crashblock) {
-	const contdrag = -0.005;
-	var ball = {"p": [0.0, 0.0], "v": [0.0, 0.0]};
-	var initangle = Math.random() * 2 * Math.PI;
-	var initv = 1.0;
-	ball["p"][0] = parseFloat(get_x());
-	ball["p"][1] = parseFloat(get_y());
-	ball["v"][0] = initv * Math.cos(initangle);
-	ball["v"][1] = initv * Math.sin(initangle);
-	print("Init " + ball["v"]);
-	var c = 0;
-	while(true) {
-		var tx = ball["p"][0] + ball["v"][0];
-		var ty = ball["p"][1] + ball["v"][1];
-		var vt = Math.sqrt(ball["v"][0]*ball["v"][0] + ball["v"][1]*ball["v"][1]);
+class pong {
+	constructor(crashwall, crashblock) {
+		this.ball = {"p": [0.0, 0.0], "v": [0.0, 0.0]};
+		this.crashwall = crashwall;
+		this.crashblock = crashblock;
+		this.contdrag = -0.005;
+		this.c = 0;
+	}
+	init() {
+		var initangle = Math.random() * 2 * Math.PI;
+		var initv = 1.0;
+		this.ball["p"][0] = parseFloat(get_x());
+		this.ball["p"][1] = parseFloat(get_y());
+		this.ball["v"][0] = initv * Math.cos(initangle);
+		this.ball["v"][1] = initv * Math.sin(initangle);
+		print("Init " + this.ball["v"]);
+		this.c = 0;
+	}
+	roll() {
+		while(true) {
+			if(this.step() != 0) break;
+			this.c += 1;
+		}
+	}
+	step() {
+		var tx = this.ball["p"][0] + this.ball["v"][0];
+		var ty = this.ball["p"][1] + this.ball["v"][1];
+		var vt = Math.sqrt(this.ball["v"][0]*this.ball["v"][0] + this.ball["v"][1]*this.ball["v"][1]);
 		var crashdir = 5;
 		if(tx > get_max_x()) {
 			tx = 2.0 * get_max_x() - tx;
-			ball["v"][0] *= -1;
+			this.ball["v"][0] *= -1;
 			crashdir += +1;
 		} else if(tx < 0.0) {
 			tx = -tx;
-			ball["v"][0] *= -1;
+			this.ball["v"][0] *= -1;
 			crashdir += -1;
 		}
 		if(ty > get_max_y()) {
 			ty = 2.0 * get_max_y() - ty;
-			ball["v"][1] *= -1;
+			this.ball["v"][1] *= -1;
 			crashdir += -3;
 		} else if(ty < 0.0) {
 			ty = -ty;
-			ball["v"][1] *= -1;
+			this.ball["v"][1] *= -1;
 			crashdir += +3;
 		}
 		if(crashdir != 5) {
-			if(crashwall(ball, crashdir) != 0) break;
+			if(this.crashwall(this.ball, crashdir) != 0) break;
 		}
-		
+
 		if(block_colors.includes(get_color(round(ty), round(tx)))) { // get_color 함수 인자의 X와 Y가 바뀌어 있더이다
 			var crashdir = 5
-			if(ball["v"][0] < 0.0 && block_colors.includes(get_color(get_y(), get_x() - 1))) {
+			if(this.ball["v"][0] < 0.0 && block_colors.includes(get_color(get_y(), get_x() - 1))) {
 				tx = 2.0 * get_x() - tx;
-				ball["v"][0] *= -1;
+				this.ball["v"][0] *= -1;
 				crashdir += -1;
-			} else if(ball["v"][0] > 0.0 && block_colors.includes(get_color(get_y(), get_x() + 1))) {
+			} else if(this.ball["v"][0] > 0.0 && block_colors.includes(get_color(get_y(), get_x() + 1))) {
 				tx = 2.0 * get_x() - tx;
-				ball["v"][0] *= -1;
+				this.ball["v"][0] *= -1;
 				crashdir += +1;
 			}
-			if(ball["v"][1] < 0.0 && block_colors.includes(get_color(get_y() - 1, get_x()))) {
+			if(this.ball["v"][1] < 0.0 && block_colors.includes(get_color(get_y() - 1, get_x()))) {
 				ty = 2.0 * get_y() - ty;
-				ball["v"][1] *= -1;
+				this.ball["v"][1] *= -1;
 				crashdir += +3;
-			} else if(ball["v"][1] > 0.0 && block_colors.includes(get_color(get_y() + 1, get_x()))) {
+			} else if(this.ball["v"][1] > 0.0 && block_colors.includes(get_color(get_y() + 1, get_x()))) {
 				ty = 2.0 * get_y() - ty;
-				ball["v"][1] *= -1;
+				this.ball["v"][1] *= -1;
 				crashdir += -3;
 			}
 			if(crashdir == 5) {
@@ -199,45 +212,31 @@ function roll(crashwall, crashblock) {
 					else if(round(ty) < get_y()) crashdir = 7;
 				}
 			}
-			if(crashblock(ball, crashdir) != 0) break;
+			if(this.crashblock(this.ball, crashdir) != 0) break;
 		}
-		
-		ball["p"][0] = tx;
-		ball["p"][1] = ty;
-		
-		tx = round(tx);
-		ty = round(ty);
-		if(tx > get_x()) {
-			set_direction('r');
-			domove(c, vt);
-		} else if(tx < get_x()) {
-			set_direction('l');
-			domove(c, vt);
-		}
-		if(ty > get_y()) {
-			set_direction('d');
-			domove(c, vt);
-		} else if(ty < get_y()) {
-			set_direction('u');
-			domove(c, vt);
-		}
-		
+
+		this.ball["p"][0] = tx;
+		this.ball["p"][1] = ty;
+
+		domove(round(tx), round(ty), this.c, vt);
+
 		if(vt <= 0.0) {
-			print("Stop " + ball["p"]);
-			break;
+			print("Stop " + this.ball["p"]);
+			return 1;
 		}
-		
-		ball["v"][0] *= Math.max((vt + contdrag) / vt, 0.0);
-		ball["v"][1] *= Math.max((vt + contdrag) / vt, 0.0); // 속도에 상관없이 일정한 감속을 부여: 수정 필요함
-		
-		c += 1;
+
+		this.ball["v"][0] *= Math.max((vt + this.contdrag) / vt, 0.0);
+		this.ball["v"][1] *= Math.max((vt + this.contdrag) / vt, 0.0); // 속도에 상관없이 일정한 감속을 부여: 수정 필요함
+		return 0;
 	}
 }
 
-press_key("space", "roll(crashwall, crashblock)")
-press_key("w", "rk1.incr()")
-press_key("s", "rk1.decr()")
-press_key("i", "rk2.incr()")
-press_key("j", "rk2.decr()")
+var pong1 = new pong();
+
+press_key("space", "setTimeout('pong1.roll(crashwall, crashblock)', 1)")
+press_key("w", "setTimeout('rk1.incr()', 1)")
+press_key("s", "setTimeout('rk1.decr()', 1)")
+press_key("i", "setTimeout('rk2.incr()', 1)")
+press_key("j", "setTimeout('rk2.decr()', 1)")
 
 print("PRESS space TO CONTINUE")
