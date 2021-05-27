@@ -103,7 +103,7 @@ class racket {
 		this.cmap.fill("#FFFFFF");
 		this.moving = false; // 뮤텍스
 	}
-	incr(callback) {
+	incr() {
 		if(this.moving) return;
 		this.moving = true;
 		if(this.y + this.l != get_max_y()) {
@@ -113,10 +113,10 @@ class racket {
 			set_color(this.y - this.l, this.x, this.cmap[this.y - this.l]);
 		}
 		this.moving = false;
-		setTimeout(callback);
+		//setTimeout(callback);
 		//print("RkIc " + this.y);
 	}
-	decr(callback) {
+	decr() {
 		if(this.moving) return;
 		this.moving = true;
 		if(this.y - this.l != 0) {
@@ -125,14 +125,14 @@ class racket {
 			set_color(this.y - this.l, this.x, this.color);
 			set_color(this.y + this.l, this.x, this.cmap[this.y + this.l]);
 		}
-		setTimeout(callback);
 		this.moving = false;
+		//setTimeout(callback);
 		//print("RkDc " + this.y);
 	}
 }
 
-rk1 = new racket(1, "#000000");
-rk2 = new racket(get_max_x() - 1, "#111111");
+rk1 = new racket(1, block_colors[0]);
+rk2 = new racket(get_max_x() - 1, block_colors[1]);
 
 class pong {
 	constructor(crashwall, crashblock) {
@@ -157,17 +157,12 @@ class pong {
 	}
 	roll() {
 		if(this.c != 0 && this.brk == true) this.init();
-		//this.loopid = setInterval(this.rep, 1)
 		while(this.rep()) {}
 	}
 	rep() {
-		print("REP");
 		var i = this.step();
 		this.c += 1;
 		if(i > 0) {
-			print("CLRR");
-			//clearInterval(this.loopid);
-			//this.loopid = undefined;
 			return false;
 		} else return true;
 	}
@@ -249,15 +244,12 @@ class pong {
 var pong1 = new pong(crashwall, crashblock);
 var pong2 = {"pong1": pong1}
 
-press_key("space", "setTimeout('pong2[\"pong1\"].roll()', 17)");
-/*press_key("w", "setTimeout('rk1.incr('pong1.roll()')', 1)");
-press_key("s", "setTimeout('rk1.decr('pong1.roll()')', 1)");
-press_key("i", "setTimeout('rk2.incr('pong1.roll()')', 1)");
-press_key("j", "setTimeout('rk2.decr('pong1.roll()')', 1)");*/
-//press_key("space", "pong1.roll()");
-press_key("w", "rk1.incr('pong2[\"pong1\"].roll()')");
-press_key("s", "rk1.decr('pong2[\"pong1\"].roll()')");
-press_key("i", "rk2.incr('pong2[\"pong1\"].roll()')");
-press_key("j", "rk2.decr('pong2[\"pong1\"].roll()')");
+//press_key("space", "setTimeout('pong2[\"pong1\"].roll()', 17)");
+press_key("w", "rk1.incr()");
+press_key("s", "rk1.decr()");
+press_key("i", "rk2.incr()");
+press_key("j", "rk2.decr(')");
+button("buttonstart", "시작", "pong2[\"pong1\"].roll()");
 
-print("PRESS space TO CONTINUE");
+print("PRESS BUTTON TO CONTINUE");
+pong2["pong1"].roll()
