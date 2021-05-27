@@ -67,7 +67,7 @@ function domove(x, y, c, v) {
 	if(r.length != 2) r = "0".repeat(2 - r.length) + r;
 	if(g.length != 2) g = "0".repeat(2 - g.length) + g;
 	if(b.length != 2) b = "0".repeat(2 - b.length) + b;
-	if(!block_colors.includes(get_color(get_y(), get_x()))) set_color("#" + r + g + b);
+	if(!block_colors.includes(get_color(get_y(), get_x()))) set_color(get_y(), get_x(), "#" + r + g + b);
 	//print("Vel  " + s + " v " + v);
 	space_jump(y, x);
 	clear_move();
@@ -86,11 +86,11 @@ function crashwall(ball, crashdir) { // 벽 충돌 Event Function
 		return 1;
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
 		return 2;
-	} else return 0;
+	} else return -1;
 }
 function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
 	print("CrsB " + ball["p"] + " " + crashdir);
-	return 0;
+	return -1;
 }
 
 class racket {
@@ -103,7 +103,7 @@ class racket {
 		this.cmap.fill("#FFFFFF");
 		this.moving = false; // 뮤텍스
 	}
-	incr() {
+	incr(callback) {
 		if(this.moving) return;
 		this.moving = true;
 		if(this.y + this.l != get_max_y()) {
@@ -113,9 +113,10 @@ class racket {
 			set_color(this.y - this.l, this.x, this.cmap[this.y - this.l]);
 		}
 		this.moving = false;
-		print("RkIc " + this.y);
+		setTimeout(callback);
+		//print("RkIc " + this.y);
 	}
-	decr() {
+	decr(callback) {
 		if(this.moving) return;
 		this.moving = true;
 		if(this.y - this.l != 0) {
@@ -124,8 +125,9 @@ class racket {
 			set_color(this.y - this.l, this.x, this.color);
 			set_color(this.y + this.l, this.x, this.cmap[this.y + this.l]);
 		}
+		setTimeout(callback);
 		this.moving = false;
-		print("RkDc " + this.y);
+		//print("RkDc " + this.y);
 	}
 }
 
@@ -137,7 +139,8 @@ class pong {
 		this.ball = {"p": [0.0, 0.0], "v": [0.0, 0.0]};
 		this.crashwall = crashwall;
 		this.crashblock = crashblock;
-		this.contdrag = -0.005;
+		//this.contdrag = -0.005;
+		this.contdrag = 0.0;
 		this.init();
 	}
 	init() {
@@ -153,14 +156,16 @@ class pong {
 		this.brk = false;
 	}
 	roll() {
-		if(this.c != 0 && this.brk) this.init();
-		while(true) {
-			if(this.step() != 0) {
-				this.brk = true;
-				break;
-			}
-			this.c += 1;
+		print(this.brk);
+		if(this.c != 0 && this.brk == true) this.init();
+		setInterval(this.rep, 1)
+	}
+	rep() {
+		if(this.step() > 0) {
+			this.brk = true;
+			break;
 		}
+		this.c += 1;
 	}
 	step() {
 		var tx = this.ball["p"][0] + this.ball["v"][0];
@@ -186,7 +191,7 @@ class pong {
 			crashdir += +3;
 		}
 		if(crashdir != 5) {
-			if(this.crashwall(this.ball, crashdir) != 0) return 3;
+			if(this.crashwall(this.ball, crashdir) > 0) return 3;
 		}
 
 		if(block_colors.includes(get_color(round(ty), round(tx)))) { // get_color 함수 인자의 X와 Y가 바뀌어 있더이다
@@ -218,7 +223,7 @@ class pong {
 					else if(round(ty) < get_y()) crashdir = 7;
 				}
 			}
-			if(this.crashblock(this.ball, crashdir) != 0) return 2;
+			if(this.crashblock(this.ball, crashdir) > 0) return 2;
 		}
 
 		this.ball["p"][0] = tx;
@@ -233,16 +238,22 @@ class pong {
 
 		this.ball["v"][0] *= Math.max((vt + this.contdrag) / vt, 0.0);
 		this.ball["v"][1] *= Math.max((vt + this.contdrag) / vt, 0.0); // 속도에 상관없이 일정한 감속을 부여: 수정 필요함
-		return 0;
+		return -1;
 	}
 }
 
-var pong1 = new pong();
+var pong1 = new pong(crashwall, crashblock);
+var pong2 = {"pong1": pong1}
 
-press_key("space", "setTimeout('pong1.roll(crashwall, crashblock)', 1)")
-press_key("w", "setTimeout('rk1.incr()', 1)")
-press_key("s", "setTimeout('rk1.decr()', 1)")
-press_key("i", "setTimeout('rk2.incr()', 1)")
-press_key("j", "setTimeout('rk2.decr()', 1)")
+press_key("space", "setTimeout('pong2[\"pong1\"].roll()', 17)");
+/*press_key("w", "setTimeout('rk1.incr('pong1.roll()')', 1)");
+press_key("s", "setTimeout('rk1.decr('pong1.roll()')', 1)");
+press_key("i", "setTimeout('rk2.incr('pong1.roll()')', 1)");
+press_key("j", "setTimeout('rk2.decr('pong1.roll()')', 1)");*/
+//press_key("space", "pong1.roll()");
+press_key("w", "rk1.incr('pong2[\"pong1\"].roll()')");
+press_key("s", "rk1.decr('pong2[\"pong1\"].roll()')");
+press_key("i", "rk2.incr('pong2[\"pong1\"].roll()')");
+press_key("j", "rk2.decr('pong2[\"pong1\"].roll()')");
 
-print("PRESS space TO CONTINUE")
+print("PRESS space TO CONTINUE");
