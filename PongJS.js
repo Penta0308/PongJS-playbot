@@ -1,17 +1,9 @@
+</script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script>
+
 // 0-based (map) indexing
 
 const block_colors = ["#000000", "#111111"]
-
 change_speed(-1);
-
-// FROM HERE
-set_color(10, 9, block_colors[0]); // y, x
-set_color(11, 9, block_colors[0]); // y, x
-set_color(12, 9, block_colors[0]); // y, x
-set_color(13, 9, block_colors[0]); // y, x
-// TO HERE
-// 테스트용 벽 만들기 코드
-
 
 // FROM HERE
 /**
@@ -244,12 +236,11 @@ class pong {
 var pong1 = new pong(crashwall, crashblock);
 var pong2 = {"pong1": pong1}
 
-//press_key("space", "setTimeout('pong2[\"pong1\"].roll()', 17)");
+press_key("space", "pong2[\"pong1\"].roll()");
 press_key("w", "rk1.incr()");
 press_key("s", "rk1.decr()");
 press_key("i", "rk2.incr()");
-press_key("j", "rk2.decr(')");
-button("buttonstart", "시작", "pong2[\"pong1\"].roll()");
+press_key("j", "rk2.decr()");
+//button("buttonstart", "시작", "pong2[\"pong1\"].roll()");
 
-print("PRESS BUTTON TO CONTINUE");
-pong2["pong1"].roll()
+print("PRESS SPACE TO CONTINUE");
