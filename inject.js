@@ -77,7 +77,7 @@ executeCode = function(code, from) {
 }
 
 executeRobot = function() {
-        displayCodeBlock("reset");
+    displayCodeBlock("reset");
     var code;
     code = editor.getValue();
     code = code.replace(str_defaultcode2, "");
@@ -97,8 +97,7 @@ executeRobot = function() {
                     code += pjs_added;
                 }
                 try {
-                    //$("#executearea").html("<script>" + code + "</" + "script>");
-                    $("#executearea").append($("<script>" + code + "</" + "script>"));
+                    $("#executearea").html("<script>" + code + "</" + "script>");
                 } catch (e) {
                     execute_catch(e);
                     return false;
