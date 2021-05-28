@@ -1,5 +1,4 @@
 // Add </script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script> Last line
-console.log("INJC");
 
 clearAllCmd = function() {
     console.log(_cmd);
@@ -219,3 +218,5 @@ window.onkeydown = function() {
         }
     }
 };
+
+console.log("INJC");
