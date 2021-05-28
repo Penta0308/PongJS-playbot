@@ -36,6 +36,11 @@ function decrCmdBus() {
       _cmds = a[0];
       _cmdindex = a[1];
       _cmd = a[2];
+    } else {
+      _cmds = 0;
+      _cmdindex = 0;
+      _cmd = [];
+      clearAllCmd();
     }
 }
 
