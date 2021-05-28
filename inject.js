@@ -64,7 +64,8 @@ executeCode = function(code, from) {
         }
     }
     try {
-        $("#executearea").html("<script>" + code + "</" + "script>");
+        //$("#executearea").html("<script>" + code + "</" + "script>");
+        $("#executearea").append($("<script>" + code + "</" + "script>"));
     } catch (e) {
         execute_catch(e);
         return false;
@@ -96,7 +97,8 @@ executeRobot = function() {
                     code += pjs_added;
                 }
                 try {
-                    $("#executearea").html("<script>" + code + "</" + "script>");
+                    //$("#executearea").html("<script>" + code + "</" + "script>");
+                    $("#executearea").append($("<script>" + code + "</" + "script>"));
                 } catch (e) {
                     execute_catch(e);
                     return false;
