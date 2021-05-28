@@ -26,11 +26,13 @@ class Stack {
 _cmdbuss = new Stack();
 
 function incrCmdBus() {
+  console.log("CMBI");
   _cmdbuss.push([_cmds, _cmdindex, JSON.parse(JSON.stringify(_cmd))]);
 }
 function decrCmdBus() {
     var a = _cmdbuss.pop();
     if(a != undefined) {
+      console.log("CMBI");
       _cmds = a[0];
       _cmdindex = a[1];
       _cmd = a[2];
