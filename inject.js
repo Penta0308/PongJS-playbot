@@ -30,7 +30,7 @@ save_cmd = function(str1, str2, str3) {
         str3 = replace(str3, "<", "<");
     }
     ++_cmds;
-    _cmd.splice(_cmds, 0, [str1, str2, String(str3)]);
+    _cmd.splice(_cmdindex, 0, [str1, str2, String(str3)]);
 }
 
 clearAllCmd = function() {
