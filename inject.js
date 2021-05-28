@@ -289,6 +289,7 @@ window.onkeydown = function() {
         for (var i = 0; i <= _keycode.length - 1; i++) {
             if (event.keyCode == _keycode[i]) {
                 keypress_what(event.keyCode);
+                console.log("KEYD " + event.keyCode);
                 //clearAllCmd();
                 backupBeforeState();
                 _runposition = "form";
