@@ -296,7 +296,7 @@ window.onkeydown = function() {
                 //restoreBeforeState();
                 clearTimeout(_delayID);
                 _delayID = setTimeout(runRobot, 0);
-                setTimeout(runRobot, 0);
+                //setTimeout(runRobot, 0);
                 //clear_move();
                 break;
             }
