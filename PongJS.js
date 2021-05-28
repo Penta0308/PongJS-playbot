@@ -2,7 +2,7 @@
 
 // 0-based (map) indexing
 
-const block_colors = ["#000000", "#111111"]
+const block_colors = ["#010101", "#020202"]
 change_speed(-1);
 
 // FROM HERE
@@ -89,7 +89,7 @@ class racket {
 	constructor(x, color) {
 		this.x = x;
 		this.y = round(get_max_y() / 2.0);
-		this.l = 1; // 길이: 1 + 2 * l
+		this.l = 6; // 길이: 1 + 2 * l
 		this.color = color;
 		this.cmap = new Array(get_max_y() + 1);
 		this.cmap.fill("#FFFFFF");
