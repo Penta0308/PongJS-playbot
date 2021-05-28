@@ -131,6 +131,69 @@ save_cmd = function(str1, str2, str3) {
     }
 }
 
+/*function set_color_action(str) {
+    var sstr = str.split("_");
+    var x, y, row, col, errorstr;
+    x = Number(sstr[0]);
+    y = Number(sstr[1]);
+    errorstr = str_set_color.replace("temp", x + "," + y);
+    if (!_worigin) {
+        if (x > _cols || x < 1 || y > _rows || y < 1) {
+            error(errorstr);
+        } else {
+            row = worldXY_to_cellXY("row", y);
+            col = worldXY_to_cellXY("col", x);
+        }
+    } else {
+        if (x > _rows - 1 || x < 0 || y > _cols - 1 || y < 0) {
+            error(errorstr);
+        } else {
+            row = x * 2;
+            col = y * 2;
+        }
+    }
+    $("#cell_" + row + "_" + col).css("background-color", sstr[2]);
+    if (!sstr[2]) {
+        for (var i = col - 1; i <= col + 1; i++) {
+            for (var j = row - 1; j <= row + 1; j++) {
+                $("#cell_" + j + "_" + i).css("background-color", "");
+            }
+        }
+    }
+}*/
+
+get_color = function(x, y) {
+    if (!checkNowRobot("get_color"))
+        return false;
+    var row, col, rv, errorstr;
+    var args = arguments.length;
+    check_remote("get_color", args);
+    errorstr = str_get_color.replace("temp", x + "," + y);
+    if (!_worigin) {
+        if (x > _cols || x < 1 || y > _rows || y < 1) {
+            error(errorstr);
+        } else {
+            row = worldXY_to_cellXY("row", y);
+            col = worldXY_to_cellXY("col", x);
+        }
+    } else {
+        if (x > _rows - 1 || x < 0 || y > _cols - 1 || y < 0) {
+            error(errorstr);
+        } else {
+            row = x * 2;
+            col = y * 2;
+        }
+    }
+  
+    rv = $("#cell_" + row + "_" + col).css("background-color");
+  
+    rv = String(rv);
+    if ((!rv) || (rv == "0")) {
+        rv = "";
+    }
+    _nowRobot.releaseNowRobot();
+    return rv;
+}
 
 clearAllCmd = function() {
     console.log(_cmds);
