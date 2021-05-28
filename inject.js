@@ -2,6 +2,10 @@
 
 _limitcount = "_";
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+} // https://stackoverflow.com/a/39914235
+
 /*function runRobot_branch() {
     _nowRobot = eval(_cmd[_cmdindex][0]);
     if (_nowRobot.state) {
@@ -116,6 +120,7 @@ save_cmd = function(str1, str2, str3) {
     runRobot_branch();
     _cmds = 0;
     _cmdindex = 0;
+    sleep(_delayTime);
 }
 
 clearAllCmd = function() {
