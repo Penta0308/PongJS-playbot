@@ -113,7 +113,9 @@ save_cmd = function(str1, str2, str3) {
     _cmd[0][2] = String(str3);
     _cmds = 1;
     _cmdindex = 0;
-    runRobot();
+    runRobot_branch();
+    _cmds = 0;
+    _cmdindex = 0;
 }
 
 clearAllCmd = function() {
@@ -130,7 +132,7 @@ clearAllCmd = function() {
 }
 //clearAllCmd = function() {}
 
-runRobot = function() {
+/*runRobot = function() {
     //if (_limitcnt == 5000) {
     //    print_action("주의 : 무한반복에 빠지는 코드입니다");
     //    _limitcnt = 0;
@@ -177,7 +179,8 @@ runRobot = function() {
             stopRobot("endcmd");
         }
     }
-}
+}*/
+runRobot = function() {}
 
 executeCode = function(code, from) {
     var i, j;
