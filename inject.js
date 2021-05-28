@@ -8,43 +8,7 @@ function sleep(milliseconds) {
   
 } // https://www.phpied.com/sleep-in-javascript/
 
-class Stack {
-  constructor() {
-    this._arr = [];
-  }
-  push(item) {
-    this._arr.push(item);
-  }
-  pop() {
-    return this._arr.pop();
-  }
-  peek() {
-    return this._arr[this._arr.length - 1];
-  }
-}
-
-_cmdbuss = new Stack();
-
-function incrCmdBus() {
-  console.log("CMBI");
-  _cmdbuss.push([_cmds, _cmdindex, JSON.parse(JSON.stringify(_cmd))]);
-}
-function decrCmdBus() {
-    var a = _cmdbuss.pop();
-    if(a != undefined) {
-      console.log("CMBI");
-      _cmds = a[0];
-      _cmdindex = a[1];
-      _cmd = a[2];
-    } else {
-      _cmds = 0;
-      _cmdindex = 0;
-      _cmd = [];
-      clearAllCmd();
-    }
-}
-
-save_cmd = function(str1, str2, str3) {
+/*save_cmd = function(str1, str2, str3) {
     if (str2 == "print") {
         str3 = replace(str3, ">", ">");
         str3 = replace(str3, "<", "<");
@@ -59,16 +23,114 @@ save_cmd = function(str1, str2, str3) {
     //_cmds = 0;
     //_cmdindex = 0;
     //sleep(_delayTime);
-}
+}*/
 
-/*save_cmd = function(str1, str2, str3) {
+save_cmd = function(str1, str2, str3) {
     if (str2 == "print") {
         str3 = replace(str3, ">", ">");
         str3 = replace(str3, "<", "<");
     }
-    ++_cmds;
-    _cmd.splice(_cmdindex, 0, [str1, str2, String(str3)]);
-}*/
+    str3 = String(str3);
+    _nowRobot = eval(str1);
+    if (_nowRobot.state) {
+        switch (str2) {
+        case ("move"):
+            move_action();
+            break;
+        case ("turn_left"):
+            turn_left_action();
+            break;
+        case ("pick_beeper"):
+            pick_beeper_action(str3);
+            break;
+        case ("put_beeper"):
+            put_beeper_action(str3);
+            break;
+        case ("turn_off"):
+            turn_off_action();
+            break;
+        case ("set_color"):
+            set_color_action(str3);
+            break;
+        case ("set_text"):
+            set_text_action(str3);
+            break;
+        case ("close_door"):
+            close_door_action();
+            break;
+        case ("open_door"):
+            open_door_action();
+            break;
+        case ("print"):
+            print_action(str3);
+            break;
+        case ("textbox"):
+            write_textbox_action(str3);
+            break;
+        case ("show_message"):
+            show_message_action(str3);
+            break;
+        case ("change_speed"):
+            change_speed_action(str3);
+            break;
+        case ("clear_move"):
+            clear_move_action();
+            break;
+        case ("space_jump"):
+            space_jump_action(str3);
+            break;
+        case ("error"):
+            error(str3);
+            break;
+        case ("pick_object"):
+            pick_object_action(str3);
+            break;
+        case ("put_object"):
+            put_object_action(str3);
+            break;
+        case ("say"):
+            say_action(str3);
+            break;
+        case ("hide"):
+            hide_action();
+            break;
+        case ("unhide"):
+            unhide_action();
+            break;
+        case ("clear_print"):
+            clear_print_action();
+            break;
+        case ("set_color_all"):
+            set_color_all_action(str3);
+            break;
+        case ("clear_color_all"):
+            set_color_all_action(str3);
+            break;
+        case ("set_colors"):
+            set_colors_action(str3);
+            break;
+        case ("set_color_area"):
+            set_color_area_action(str3);
+            break;
+        case ("clear_cell"):
+            clear_cell_action(str3);
+            break;
+        case ("show_chart"):
+            show_chart_action();
+            break;
+        case ("set_rgb"):
+            set_rgb_action(str3);
+            break;
+        case ("hide_world"):
+            hide_world_action();
+            break;
+        case ("show_world"):
+            show_world_action();
+            break;
+        }
+    }
+}
+
 
 clearAllCmd = function() {
     console.log(_cmds);
