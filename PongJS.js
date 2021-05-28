@@ -135,6 +135,7 @@ class pong {
 		this.contdrag = 0.0;
 		this.init();
 		this.loopid = null;
+		this.brk = false;
 	}
 	init() {
 		var initangle = Math.random() * 2 * Math.PI;
@@ -148,7 +149,7 @@ class pong {
 		this.c = 0;
 	}
 	roll() {
-		if(this.c != 0 && this.brk == true) this.init();
+		if(this.c != 0 && this.loopid == null) this.init();
 		var setInterval = window.setInterval;
 		this.loopid = setInterval(pong2["pong1"].step, 100);
 	}
@@ -240,9 +241,9 @@ class pong {
 }
 
 var pong1 = new pong(crashwall, crashblock);
-var pong2 = {"pong1": pong1}
+var pong2 = {"pong1": pong1};
 
-//press_key("space", "pong2[\"pong1\"].roll()");
+press_key("space", "pong2[\"pong1\"].roll()");
 press_key("w", "rk1.incr()");
 press_key("s", "rk1.decr()");
 press_key("i", "rk2.incr()");
