@@ -30,9 +30,11 @@ function incrCmdBus() {
 }
 function decrCmdBus() {
     var a = _cmdbuss.pop();
-    _cmds = a[0];
-    _cmdindex = a[1];
-    _cmd = a[2];
+    if(a != undefined) {
+      _cmds = a[0];
+      _cmdindex = a[1];
+      _cmd = a[2];
+    }
 }
 
 save_cmd = function(str1, str2, str3) {
