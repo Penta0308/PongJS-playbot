@@ -4,11 +4,8 @@ _limitcount = "_";
 
 function sleep(milliseconds) {
   var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
+  while(new Date().getTime() - start < milliseconds) {}
+  
 } // https://www.phpied.com/sleep-in-javascript/
 
 save_cmd = function(str1, str2, str3) {
@@ -16,15 +13,24 @@ save_cmd = function(str1, str2, str3) {
         str3 = replace(str3, ">", ">");
         str3 = replace(str3, "<", "<");
     }
-    _cmd[0][0] = str1;
-    _cmd[0][1] = str2;
-    _cmd[0][2] = String(str3);
-    _cmds = 1;
-    _cmdindex = 0;
-    runRobot_branch();
-    _cmds = 0;
-    _cmdindex = 0;
-    sleep(_delayTime);
+    _cmd[_cmds][0] = str1;
+    _cmd[_cmds][1] = str2;
+    _cmd[_cmds][2] = String(str3);
+    ++_cmds;
+    //_cmds = 1;
+    //_cmdindex = 0;
+    //runRobot_branch();
+    //_cmds = 0;
+    //_cmdindex = 0;
+    //sleep(_delayTime);
+}
+inject_cmd = function(str1, str2, str3) {
+    if (str2 == "print") {
+        str3 = replace(str3, ">", ">");
+        str3 = replace(str3, "<", "<");
+    }
+    ++_cmds;
+    _cmd.splice(_cmds, 0, [str1, str2, String(str3)]);
 }
 
 clearAllCmd = function() {
@@ -41,7 +47,7 @@ clearAllCmd = function() {
 }
 //clearAllCmd = function() {}
 
-/*runRobot = function() {
+runRobot = function() {
     //if (_limitcnt == 5000) {
     //    print_action("주의 : 무한반복에 빠지는 코드입니다");
     //    _limitcnt = 0;
@@ -88,8 +94,8 @@ clearAllCmd = function() {
             stopRobot("endcmd");
         }
     }
-}*/
-runRobot = function() {}
+}
+//runRobot = function() {}
 
 executeCode = function(code, from) {
     var i, j;
@@ -139,8 +145,7 @@ executeCode = function(code, from) {
         }
     }
     try {
-        //$("#executearea").html("<script>" + code + "</" + "script>");
-        $("#executearea").append($("<script>" + code + "</" + "script>"));
+        $("#executearea").html("<script>" + code + "</" + "script>");
     } catch (e) {
         execute_catch(e);
         return false;
@@ -194,7 +199,6 @@ executeRobot = function() {
                 displayObject();
                 keypress_on();
                 _runposition = "main";
-                setTimeout(() => $("#executearea").html(""), 1);
                 if (_achecks != "oj") {
                     executeCode(code, _runposition);
                     _delayID = setTimeout(runRobot, _delayTime);
