@@ -16,6 +16,55 @@ clearAllCmd = function() {
 }
 //clearAllCmd = function() {}
 
+runRobot = function() {
+    //if (_limitcnt == 5000) {
+    //    print_action("주의 : 무한반복에 빠지는 코드입니다");
+    //    _limitcnt = 0;
+    //}
+    if (!_fastmode) {
+        if (_cmdindex == _cmds) {
+            if (_cmds == 0) {
+                stopRobot("endcmd");
+            } else if (_nowRobot.state) {
+                stopRobot("endcmd");
+            }
+        } else {
+            while ((_cmdindex != _cmds) && (eval(_cmd[_cmdindex][0]).state == 0)) {
+                _cmdindex++;
+            }
+            runRobot_branch();
+            if ((_cmd[_cmdindex][1] == "show_message") || (_cmd[_cmdindex][1] == "say") || (_cmd[_cmdindex][1] == "show_chart")) {
+                _cmdindex++;
+            } else if ((_cmd[_cmdindex][1] == "change_speed") && (_cmd[_cmdindex][2] == -1)) {
+                _cmdindex++;
+                _delayID = setTimeout(runRobot, 0);
+            } else {
+                _cmdindex++;
+                _delayID = setTimeout(runRobot, _delayTime);
+            }
+        }
+    } else {
+        while (_cmdindex <= _cmds - 1) {
+            runRobot_branch();
+            if ((_cmd[_cmdindex][1] == "show_message") || (_cmd[_cmdindex][1] == "say") || (_cmd[_cmdindex][1] == "show_chart")) {
+                _cmdindex++;
+                break;
+            } else if ((_cmd[_cmdindex][1] == "change_speed") && (_cmd[_cmdindex][2] > -1)) {
+                break;
+            } else {
+                _cmdindex++;
+            }
+        }
+        if ((_cmd[_cmdindex][1] == "change_speed") && (_cmd[_cmdindex][2] > -1)) {
+            _cmdindex++;
+            runRobot();
+        }
+        if (_cmdindex == _cmds) {
+            stopRobot("endcmd");
+        }
+    }
+}
+
 executeCode = function(code, from) {
     var i, j;
     _bracket = bracket_string(code);
@@ -209,15 +258,15 @@ window.onkeydown = function() {
         for (var i = 0; i <= _keycode.length - 1; i++) {
             if (event.keyCode == _keycode[i]) {
                 keypress_what(event.keyCode);
-                clearAllCmd();
-                backupBeforeState();
+                //clearAllCmd();
+                //backupBeforeState();
                 _runposition = "form";
                 executeCode(_keyfunc[i], _runposition);
-                restoreBeforeState();
+                //restoreBeforeState();
                 //clearTimeout(_delayID);
                 //_delayID = setTimeout(runRobot, 0);
                 setTimeout(runRobot, 0);
-                clear_move();
+                //clear_move();
                 break;
             }
         }
