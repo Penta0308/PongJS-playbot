@@ -290,10 +290,10 @@ window.onkeydown = function() {
             if (event.keyCode == _keycode[i]) {
                 keypress_what(event.keyCode);
                 //clearAllCmd();
-                //backupBeforeState();
+                backupBeforeState();
                 _runposition = "form";
                 executeCode(_keyfunc[i], _runposition);
-                //restoreBeforeState();
+                restoreBeforeState();
                 clearTimeout(_delayID);
                 _delayID = setTimeout(runRobot, 0);
                 //setTimeout(runRobot, 0);
