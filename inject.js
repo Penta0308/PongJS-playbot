@@ -1,4 +1,6 @@
-// Add </script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script> Last line
+// Add </script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script> at Top
+
+_limitcount = "_";
 
 clearAllCmd = function() {
     console.log(_cmds);
