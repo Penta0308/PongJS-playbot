@@ -162,6 +162,9 @@ save_cmd = function(str1, str2, str3) {
     }
 }*/
 
+const rgb2hex = (rgb) => `#${rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/).slice(1).map(n => parseInt(n, 10).toString(16).padStart(2, '0')).join('')}`
+// https://stackoverflow.com/a/3627747
+
 get_color = function(x, y) {
     if (!checkNowRobot("get_color"))
         return false;
@@ -190,7 +193,7 @@ get_color = function(x, y) {
     rv = String(rv);
     if ((!rv) || (rv == "0")) {
         rv = "";
-    }
+    } else rv = rgb2hex(rv);
     _nowRobot.releaseNowRobot();
     return rv;
 }
