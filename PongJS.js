@@ -62,7 +62,7 @@ function domove(x, y, c, v) {
 	if(!block_colors.includes(get_color(get_y(), get_x()))) set_color(get_y(), get_x(), "#" + r + g + b);
 	//print("Vel  " + s + " v " + v);
 	space_jump(y, x);
-	clear_move();
+	//clear_move(); // 리소스 엄청 
 }
 
 function set_direction(d) {
@@ -240,7 +240,7 @@ press_key("space", "pong2[\"pong1\"].roll()");
 press_key("w", "rk1.incr()");
 press_key("s", "rk1.decr()");
 press_key("i", "rk2.incr()");
-press_key("j", "rk2.decr()");
+press_key("k", "rk2.decr()");
 //button("buttonstart", "시작", "pong2[\"pong1\"].roll()");
 
 print("PRESS SPACE TO CONTINUE");
