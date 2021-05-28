@@ -1,6 +1,65 @@
 // Add </script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script> Last line
 console.log("INJC");
 
+executeCode = function(code, from) {
+    var i, j;
+    _bracket = bracket_string(code);
+    code = "_limitcnt = 0;" + code;
+    //code = code.replace(/document.write/gi, "print");
+    //code = code.replace(/alert/gi, "popup");
+    //code = code.replace(/while\(/gi, "while ((++_limitcnt < 5000) && ");
+    //code = code.replace(/while \(/gi, "while ((++_limitcnt < 5000) && ");
+    var splitCode = code.split("\n");
+    var splitName, tmpPosition;
+    var fname = "", fixname;
+    for (i = 0; i <= splitCode.length - 1; i++) {
+        if (i == 0) {
+            splitCode[i] = splitCode[i].replace(/_limitcnt = 0;/gi, "");
+        }
+        if (!(splitCode[i].trim().indexOf("function"))) {
+            splitName = splitCode[i].trim().split(" ");
+            tmpPosition = splitName[1].trim().indexOf("(");
+            if (tmpPosition > 0) {
+                fname = splitName[1].trim().substr(0, tmpPosition);
+            } else {
+                fname = splitName[1].trim();
+            }
+            if (_functionRegExp.test(fname)) {
+                error(str_executeCode3.replace("temp", fname));
+                fname = fname.replace(_functionRegExp, "");
+                return false;
+            }
+            _functionList.push(fname);
+            fixname = _functionFix.split("|");
+            for (j = 0; j <= fixname.length - 2; j++) {
+                if (fname == fixname[j]) {
+                    error(str_executeCode1.replace("temp", fixname[j]));
+                    return false;
+                }
+            }
+        }
+        var v1, v2, v3;
+        v1 = splitCode[i].trim().indexOf("=");
+        if (v1 > -1) {
+            v2 = splitCode[i].trim().substr(v1 + 1, 1);
+            if (v2 != "=") {
+                v3 = splitCode[i].trim().substr(0, v1).trim();
+                _variableList.push(v3);
+            }
+        }
+    }
+    try {
+        $("#executearea").html("<script>" + code + "</" + "script>");
+    } catch (e) {
+        execute_catch(e);
+        return false;
+    } finally {
+        if (from == "main") {
+            refreshRobot_semi();
+        }
+    }
+}
+
 executeRobot = function() {
         displayCodeBlock("reset");
     var code;
