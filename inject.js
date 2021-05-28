@@ -191,7 +191,7 @@ get_color = function(x, y) {
     rv = $("#cell_" + row + "_" + col).css("background-color");
   
     rv = String(rv);
-    if ((!rv) || (rv == "0")) {
+    if ((!rv) || (rv == "0") || !rv.includes("rgb(")) {
         rv = "";
     } else rv = rgb2hex(rv);
     _nowRobot.releaseNowRobot();
