@@ -169,6 +169,7 @@ executeRobot = function() {
                 keypress_on();
                 _runposition = "main";
                 if (_achecks != "oj") {
+                    $("#executearea").html("");
                     executeCode(code, _runposition);
                     _delayID = setTimeout(runRobot, _delayTime);
                 } else {
