@@ -169,8 +169,8 @@ executeRobot = function() {
                 keypress_on();
                 executeCode(code, _runposition);
                 _runposition = "main";
+                $("#executearea").html("");
                 if (_achecks != "oj") {
-                    $("#executearea").html("");
                     _delayID = setTimeout(runRobot, _delayTime);
                 } else {
                     var instr, anstr, ti, tcode;
@@ -264,8 +264,8 @@ window.onkeydown = function() {
                 _runposition = "form";
                 executeCode(_keyfunc[i], _runposition);
                 //restoreBeforeState();
-                //clearTimeout(_delayID);
-                //_delayID = setTimeout(runRobot, 0);
+                clearTimeout(_delayID);
+                _delayID = setTimeout(runRobot, 0);
                 setTimeout(runRobot, 0);
                 //clear_move();
                 break;
