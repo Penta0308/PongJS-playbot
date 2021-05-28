@@ -8,7 +8,34 @@ function sleep(milliseconds) {
   
 } // https://www.phpied.com/sleep-in-javascript/
 
-/*save_cmd = function(str1, str2, str3) {
+class Stack {
+  constructor() {
+    this._arr = [];
+  }
+  push(item) {
+    this._arr.push(item);
+  }
+  pop() {
+    return this._arr.pop();
+  }
+  peek() {
+    return this._arr[this._arr.length - 1];
+  }
+}
+
+_cmdbuss = new Stack();
+
+function incrCmdBus() {
+  _cmdbuss.push([_cmds, _cmdindex, JSON.parse(JSON.stringify(_cmd));
+}
+function decrCmdBus() {
+    var a = _cmdbuss.pop();
+    _cmds = a[0];
+    _cmdindex = a[1];
+    _cmd = a[2];
+}
+
+save_cmd = function(str1, str2, str3) {
     if (str2 == "print") {
         str3 = replace(str3, ">", ">");
         str3 = replace(str3, "<", "<");
@@ -23,16 +50,16 @@ function sleep(milliseconds) {
     //_cmds = 0;
     //_cmdindex = 0;
     //sleep(_delayTime);
-}*/
+}
 
-save_cmd = function(str1, str2, str3) {
+/*save_cmd = function(str1, str2, str3) {
     if (str2 == "print") {
         str3 = replace(str3, ">", ">");
         str3 = replace(str3, "<", "<");
     }
     ++_cmds;
     _cmd.splice(_cmdindex, 0, [str1, str2, String(str3)]);
-}
+}*/
 
 clearAllCmd = function() {
     console.log(_cmds);
@@ -56,8 +83,10 @@ runRobot = function() {
     if (!_fastmode) {
         if (_cmdindex == _cmds) {
             if (_cmds == 0) {
+                decrCmdBus();
                 stopRobot("endcmd");
             } else if (_nowRobot.state) {
+                decrCmdBus();
                 stopRobot("endcmd");
             }
         } else {
@@ -92,6 +121,7 @@ runRobot = function() {
             runRobot();
         }
         if (_cmdindex == _cmds) {
+            decrCmdBus();
             stopRobot("endcmd");
         }
     }
@@ -291,8 +321,9 @@ window.onkeydown = function() {
             if (event.keyCode == _keycode[i]) {
                 keypress_what(event.keyCode);
                 console.log("KEYD " + event.keyCode);
-                //clearAllCmd();
                 backupBeforeState();
+                incrCmdBus();
+                clearAllCmd();
                 _runposition = "form";
                 if (_nowRobot.state) eval(_keyfunc[i]);
                 else executeCode(_keyfunc[i], _runposition);
