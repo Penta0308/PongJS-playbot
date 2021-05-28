@@ -3,7 +3,7 @@
 // 0-based (map) indexing
 
 const block_colors = ["#000000", "#111111"]
-change_speed(-1);
+change_speed(1);
 
 // FROM HERE
 /**
@@ -47,11 +47,11 @@ function hsvToRgb(h, s, v) {
 
 function domove(x, y, c, v) {
 	var s = round((1 - v) * 5);
-	change_speed(0);
+	change_speed(10);
 	for(i = 0; i < s; i++)
 		for(q = 0; q < 4; q++)
 			turn_left(); // 시간 지연용 제자리 돌기
-	change_speed(-1);
+	change_speed(1);
 	var color = hsvToRgb((((c * 3) % 360) / 360.0), 0.7 - (1.0 - v) * 0.7, 0.9 + (1.0 - v) * 0.1);
 	var r = (round(color[0])).toString(16);
 	var g = (round(color[1])).toString(16);
