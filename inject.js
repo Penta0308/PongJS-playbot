@@ -1,7 +1,8 @@
 // Add </script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script> Last line
 
-/*clearAllCmd = function() {
-    //console.log(_cmd);
+clearAllCmd = function() {
+    console.log(_cmds);
+    console.log(_cmdindex);
     _cmds = 0;
     _cmdindex = 0;
     for (var i = 0; i <= _maxCmds - 1; i++) {
@@ -10,13 +11,13 @@
         _cmd[i][1] = "";
         _cmd[i][2] = "";
     }
-}*/
-clearAllCmd = function() {}
+}
+//clearAllCmd = function() {}
 
 executeCode = function(code, from) {
     var i, j;
     _bracket = bracket_string(code);
-    code = "_limitcnt = 0;" + code;
+    //code = "_limitcnt = 0;" + code;
     //code = code.replace(/document.write/gi, "print");
     //code = code.replace(/alert/gi, "popup");
     //code = code.replace(/while\(/gi, "while ((++_limitcnt < 5000) && ");
