@@ -2,6 +2,120 @@
 
 _limitcount = "_";
 
+/*function runRobot_branch() {
+    _nowRobot = eval(_cmd[_cmdindex][0]);
+    if (_nowRobot.state) {
+        switch (_cmd[_cmdindex][1]) {
+        case ("move"):
+            move_action();
+            break;
+        case ("turn_left"):
+            turn_left_action();
+            break;
+        case ("pick_beeper"):
+            pick_beeper_action(_cmd[_cmdindex][2]);
+            break;
+        case ("put_beeper"):
+            put_beeper_action(_cmd[_cmdindex][2]);
+            break;
+        case ("turn_off"):
+            turn_off_action();
+            break;
+        case ("set_color"):
+            set_color_action(_cmd[_cmdindex][2]);
+            break;
+        case ("set_text"):
+            set_text_action(_cmd[_cmdindex][2]);
+            break;
+        case ("close_door"):
+            close_door_action();
+            break;
+        case ("open_door"):
+            open_door_action();
+            break;
+        case ("print"):
+            print_action(_cmd[_cmdindex][2]);
+            break;
+        case ("textbox"):
+            write_textbox_action(_cmd[_cmdindex][2]);
+            break;
+        case ("show_message"):
+            show_message_action(_cmd[_cmdindex][2]);
+            break;
+        case ("change_speed"):
+            change_speed_action(_cmd[_cmdindex][2]);
+            break;
+        case ("clear_move"):
+            clear_move_action();
+            break;
+        case ("space_jump"):
+            space_jump_action(_cmd[_cmdindex][2]);
+            break;
+        case ("error"):
+            error(_cmd[_cmdindex][2]);
+            break;
+        case ("pick_object"):
+            pick_object_action(_cmd[_cmdindex][2]);
+            break;
+        case ("put_object"):
+            put_object_action(_cmd[_cmdindex][2]);
+            break;
+        case ("say"):
+            say_action(_cmd[_cmdindex][2]);
+            break;
+        case ("hide"):
+            hide_action();
+            break;
+        case ("unhide"):
+            unhide_action();
+            break;
+        case ("clear_print"):
+            clear_print_action();
+            break;
+        case ("set_color_all"):
+            set_color_all_action(_cmd[_cmdindex][2]);
+            break;
+        case ("clear_color_all"):
+            set_color_all_action(_cmd[_cmdindex][2]);
+            break;
+        case ("set_colors"):
+            set_colors_action(_cmd[_cmdindex][2]);
+            break;
+        case ("set_color_area"):
+            set_color_area_action(_cmd[_cmdindex][2]);
+            break;
+        case ("clear_cell"):
+            clear_cell_action(_cmd[_cmdindex][2]);
+            break;
+        case ("show_chart"):
+            show_chart_action();
+            break;
+        case ("set_rgb"):
+            set_rgb_action(_cmd[_cmdindex][2]);
+            break;
+        case ("hide_world"):
+            hide_world_action();
+            break;
+        case ("show_world"):
+            show_world_action();
+            break;
+        }
+    }
+}*/
+
+save_cmd = function(str1, str2, str3) {
+    if (str2 == "print") {
+        str3 = replace(str3, ">", ">");
+        str3 = replace(str3, "<", "<");
+    }
+    _cmd[0][0] = str1;
+    _cmd[0][1] = str2;
+    _cmd[0][2] = String(str3);
+    _cmds = 1;
+    _cmdindex = 0;
+    runRobot();
+}
+
 clearAllCmd = function() {
     console.log(_cmds);
     console.log(_cmdindex);
