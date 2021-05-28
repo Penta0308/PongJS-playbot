@@ -167,10 +167,10 @@ executeRobot = function() {
                 displayBeeper();
                 displayObject();
                 keypress_on();
-                executeCode(code, _runposition);
                 _runposition = "main";
-                $("#executearea").html("");
+                setTimeout(() => $("#executearea").html(""), 1);
                 if (_achecks != "oj") {
+                    executeCode(code, _runposition);
                     _delayID = setTimeout(runRobot, _delayTime);
                 } else {
                     var instr, anstr, ti, tcode;
