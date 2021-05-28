@@ -2,9 +2,14 @@
 
 _limitcount = "_";
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-} // https://stackoverflow.com/a/39914235
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+} // https://www.phpied.com/sleep-in-javascript/
 
 save_cmd = function(str1, str2, str3) {
     if (str2 == "print") {
