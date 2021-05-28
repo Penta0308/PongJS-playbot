@@ -146,7 +146,7 @@ clearAllCmd = function() {
 }
 //clearAllCmd = function() {}
 
-runRobot = function() {
+/*runRobot = function() {
     //if (_limitcnt == 5000) {
     //    print_action("주의 : 무한반복에 빠지는 코드입니다");
     //    _limitcnt = 0;
@@ -196,8 +196,8 @@ runRobot = function() {
             stopRobot("endcmd");
         }
     }
-}
-//runRobot = function() {}
+}*/
+runRobot = function() {}
 
 executeCode = function(code, from) {
     var i, j;
@@ -393,7 +393,7 @@ window.onkeydown = function() {
                 keypress_what(event.keyCode);
                 console.log("KEYD " + event.keyCode);
                 backupBeforeState();
-                incrCmdBus();
+                //incrCmdBus();
                 clearAllCmd();
                 _runposition = "form";
                 if (_nowRobot.state) eval(_keyfunc[i]);
