@@ -1,7 +1,7 @@
 // Add </script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script> Last line
 
-clearAllCmd = function() {
-    console.log(_cmd);
+/*clearAllCmd = function() {
+    //console.log(_cmd);
     _cmds = 0;
     _cmdindex = 0;
     for (var i = 0; i <= _maxCmds - 1; i++) {
@@ -10,7 +10,8 @@ clearAllCmd = function() {
         _cmd[i][1] = "";
         _cmd[i][2] = "";
     }
-}
+}*/
+clearAllCmd = function() {}
 
 executeCode = function(code, from) {
     var i, j;
