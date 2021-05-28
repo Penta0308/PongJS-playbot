@@ -1,6 +1,18 @@
 // Add </script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script> Last line
 console.log("INJC");
 
+clearAllCmd = function() {
+    console.log(_cmd);
+    _cmds = 0;
+    _cmdindex = 0;
+    for (var i = 0; i <= _maxCmds - 1; i++) {
+        _cmd[i] = new Array();
+        _cmd[i][0] = "";
+        _cmd[i][1] = "";
+        _cmd[i][2] = "";
+    }
+}
+
 executeCode = function(code, from) {
     var i, j;
     _bracket = bracket_string(code);
