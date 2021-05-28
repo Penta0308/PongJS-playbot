@@ -293,7 +293,9 @@ window.onkeydown = function() {
                 //clearAllCmd();
                 backupBeforeState();
                 _runposition = "form";
-                executeCode(_keyfunc[i], _runposition);
+                if (_nowRobot.state) 
+                  eval(_keyfunc[i]);
+                else executeCode(_keyfunc[i], _runposition);
                 restoreBeforeState();
                 clearTimeout(_delayID);
                 _delayID = setTimeout(runRobot, 0);
