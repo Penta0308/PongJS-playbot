@@ -8,7 +8,7 @@ function sleep(milliseconds) {
   
 } // https://www.phpied.com/sleep-in-javascript/
 
-save_cmd = function(str1, str2, str3) {
+/*save_cmd = function(str1, str2, str3) {
     if (str2 == "print") {
         str3 = replace(str3, ">", ">");
         str3 = replace(str3, "<", "<");
@@ -23,8 +23,8 @@ save_cmd = function(str1, str2, str3) {
     //_cmds = 0;
     //_cmdindex = 0;
     //sleep(_delayTime);
-}
-inject_cmd = function(str1, str2, str3) {
+}*/
+save_cmd = function(str1, str2, str3) {
     if (str2 == "print") {
         str3 = replace(str3, ">", ">");
         str3 = replace(str3, "<", "<");
