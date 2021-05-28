@@ -24,6 +24,7 @@ function sleep(milliseconds) {
     //_cmdindex = 0;
     //sleep(_delayTime);
 }*/
+
 save_cmd = function(str1, str2, str3) {
     if (str2 == "print") {
         str3 = replace(str3, ">", ">");
@@ -293,8 +294,7 @@ window.onkeydown = function() {
                 //clearAllCmd();
                 backupBeforeState();
                 _runposition = "form";
-                if (_nowRobot.state) 
-                  eval(_keyfunc[i]);
+                if (_nowRobot.state) eval(_keyfunc[i]);
                 else executeCode(_keyfunc[i], _runposition);
                 restoreBeforeState();
                 clearTimeout(_delayID);
