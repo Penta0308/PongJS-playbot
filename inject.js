@@ -26,7 +26,7 @@ class Stack {
 _cmdbuss = new Stack();
 
 function incrCmdBus() {
-  _cmdbuss.push([_cmds, _cmdindex, JSON.parse(JSON.stringify(_cmd));
+  _cmdbuss.push([_cmds, _cmdindex, JSON.parse(JSON.stringify(_cmd))]);
 }
 function decrCmdBus() {
     var a = _cmdbuss.pop();
