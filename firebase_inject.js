@@ -40,7 +40,7 @@ function addleaderboard(score) {
   ldb.set({
       id: _userid,
       name: _username,
-      at: Timestamp.now(),
+      at: firebase.firestore.Timestamp.now(),
       score: score
   }).then((docRef) => {
       console.log("Document written with ID: ", docRef.id);
