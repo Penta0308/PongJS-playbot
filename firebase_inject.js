@@ -1,9 +1,14 @@
 if(!($("#dscriptarea").length)) {
-  $("#executearea").before("<div id=\"dscriptarea\"></div>")
-  $("#dscriptarea").append("<script src=\"https://www.gstatic.com/firebasejs/8.5.0/firebase-app.js\"></" + "script>"
-                           + "<script src=\"https://www.gstatic.com/firebasejs/8.5.0/firebase-analytics.js\"></" + "script>"
-                           + "<script src=\"https://www.gstatic.com/firebasejs/8.5.0/firebase-auth.js\"></" + "script>"
-                           + "<script src=\"https://www.gstatic.com/firebasejs/8.5.0/firebase-firestore.js\"></" + "script>")
+  $("#executearea").before("<div id=\"dscriptarea\"></div>");
+  var script = document.createElement("script");
+  script.src = "https://www.gstatic.com/firebasejs/8.5.0/firebase-app.js";
+  $("#dscriptarea")[0].appendChild(script);
+  script.src = "https://www.gstatic.com/firebasejs/8.5.0/firebase-analytics.js";
+  $("#dscriptarea")[0].appendChild(script);
+  script.src = "https://www.gstatic.com/firebasejs/8.5.0/firebase-auth.js";
+  $("#dscriptarea")[0].appendChild(script);
+  script.src = "https://www.gstatic.com/firebasejs/8.5.0/firebase-firestore.js";
+  $("#dscriptarea")[0].appendChild(script);
   // Your web app's Firebase configuration
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   var firebaseConfig = {
