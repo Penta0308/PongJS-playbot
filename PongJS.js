@@ -142,19 +142,19 @@ class racket {
 		for(var y = this.y - this.l; y <= this.y + this.l; y++) lmap.setcolor(layer_racket, y, this.x, this.color[0], this.color[1], this.color[2], 1.0);
 	}
 	incr() {
-		if(this.y + this.l != get_max_y()) {
+		if(this.y + this.l <= get_max_y() - 1) {
+			lmap.setcolor(layer_racket, this.y - this.l, this.x, 0.0, 0.0, 0.0, 0.0); // Clear
 			this.y += 1;
 			lmap.setcolor(layer_racket, this.y + this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
-			lmap.setcolor(layer_racket, this.y - this.l, this.x, 0.0, 0.0, 0.0, 0.0); // Clear
 		}
 		//setTimeout(callback);
 		print("RkIc " + this.y);
 	}
 	decr() {
-		if(this.y - this.l != 0) {
+		if(this.y - this.l >= 1) {
+			lmap.setcolor(layer_racket, this.y + this.l + 1, this.x, 0.0, 0.0, 0.0, 0.0);
 			this.y -= 1;
 			lmap.setcolor(layer_racket, this.y - this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
-			lmap.setcolor(layer_racket, this.y + this.l, this.x, 0.0, 0.0, 0.0, 0.0);
 		}
 		//setTimeout(callback);
 		print("RkDc " + this.y);
