@@ -5,10 +5,13 @@ if(!($("#dscriptarea").length)) {
   var script = document.createElement("script");
   script.src = "https://www.gstatic.com/firebasejs/8.5.0/firebase-app.js";
   $("#dscriptarea")[0].appendChild(script);
+  script = document.createElement("script");
   script.src = "https://www.gstatic.com/firebasejs/8.5.0/firebase-analytics.js";
   $("#dscriptarea")[0].appendChild(script);
+  script = document.createElement("script");
   script.src = "https://www.gstatic.com/firebasejs/8.5.0/firebase-auth.js";
   $("#dscriptarea")[0].appendChild(script);
+  script = document.createElement("script");
   script.src = "https://www.gstatic.com/firebasejs/8.5.0/firebase-firestore.js";
   $("#dscriptarea")[0].appendChild(script);
 }
