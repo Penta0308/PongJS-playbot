@@ -312,16 +312,16 @@ executeCode = function(code, from) {
             }
         }
     }
-    try {
+    //try {
         $("#executearea").html("<script>" + code + "</" + "script>");
-    } catch (e) {
-        execute_catch(e);
-        return false;
-    } finally {
+    //} catch (e) {
+    //    execute_catch(e);
+    //    return false;
+    //} finally {
         if (from == "main") {
             refreshRobot_semi();
         }
-    }
+    //}
 }
 
 executeRobot = function() {
