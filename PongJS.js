@@ -5,27 +5,27 @@
 
 // 0-based 좌표계
 
-const block_colors = ["#010101", "#020202"]
+var block_colors = ["#010101", "#020202"];
 change_speed(-1);
 
-const layers = 2;
-const layer_ball = 0;
-const layer_racket = 1;
+var layers = 2;
+var layer_ball = 0;
+var layer_racket = 1;
 
 class layermap {
 	constructor(n) {
-		this.bg = {'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 1.0}; // 불투명 백색 RGBA
+		print("Starting LMap...");
 		this.layers = [];
 		this.n = n;
 		for(var i = 0; i < this.n; i++) {
 			var plane = [];
-			for(var x = 0; x <= get_max_x(); x++) {
-				var yl = [];
-				for(var y = 0; y <= get_max_y; y++) {
+			for(var y = 0; y <= get_max_y(); y++) {
+				var xl = [];
+				for(var x = 0; x <= get_max_x(); x++) {
 					var px = {'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 0.0}; // 투명 백색 RGBA
-					yl.push(px);
+					xl.push(px);
 				}
-				plane.push(yl);
+				plane.push(xl);
 			}
 			this.layers.push(plane);
 		}
@@ -35,8 +35,8 @@ class layermap {
 		for(var i = 0; i < this.n; i++) {
 			var a = this.layers[i][x][y]["a"];
 			r = this.layers[i][x][y]["r"] * a + r * (1 - a);
-			g = this.layers[i][x][y]["r"] * a + g * (1 - a);
-			b = this.layers[i][x][y]["r"] * a + b * (1 - a);
+			g = this.layers[i][x][y]["g"] * a + g * (1 - a);
+			b = this.layers[i][x][y]["b"] * a + b * (1 - a);
 		}
 		var rs = (round(r * 255)).toString(16);
 		var gs = (round(g * 255)).toString(16);
@@ -44,14 +44,14 @@ class layermap {
 		if(rs.length != 2) rs = "0".repeat(2 - rs.length) + rs;
 		if(gs.length != 2) gs = "0".repeat(2 - gs.length) + gs;
 		if(bs.length != 2) bs = "0".repeat(2 - bs.length) + bs;
-		set_color("#" + rs + gs + bs);
+		set_color(x, y, "#" + rs + gs + bs);
 	}
-	setcolor(l, x, y, r, g, b, a) {
+	setcolor(l, x, y, _r, _g, _b, _a) {
 		var px = this.layers[l][x][y];
-		px["r"] = r;
-		px["g"] = g;
-		px["b"] = b;
-		px["a"] = a;
+		px["r"] = _r;
+		px["g"] = _g;
+		px["b"] = _b;
+		px["a"] = _a;
 		this.recalc(x, y);
 	}
 }
@@ -138,7 +138,7 @@ class racket {
 		this.x = x;
 		this.y = round(get_max_y() / 2.0);
 		this.l = 6; // 길이: 1 + 2 * l
-		this.color = [color.substring(1, 3).parseInt() / 255.0, color.substring(3, 5).parseInt() / 255.0, color.substring(5, 7).parseInt() / 255.0];
+		this.color = [parseInt(color.substring(1, 3), 10) / 255.0, parseInt(color.substring(3, 5), 10) / 255.0, parseInt(color.substring(5, 7), 10) / 255.0];
 		for(var y = this.y - this.l; y <= this.y + this.l; y++) lmap.setcolor(layer_racket, y, this.x, this.color[0], this.color[1], this.color[2], 1.0);
 	}
 	incr() {
@@ -161,8 +161,8 @@ class racket {
 	}
 }
 
-rk1 = new racket(1, block_colors[0]);
-rk2 = new racket(get_max_x() - 1, block_colors[1]);
+var rk1 = new racket(1, block_colors[0]);
+var rk2 = new racket(get_max_x() - 1, block_colors[1]);
 
 class pong {
 	constructor(crashwall, crashblock) {
