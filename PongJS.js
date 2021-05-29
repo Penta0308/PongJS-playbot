@@ -3,10 +3,60 @@
 <script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script>
 <script>
 
-// 0-based (map) indexing
+// 0-based 좌표계
 
 const block_colors = ["#010101", "#020202"]
 change_speed(-1);
+
+const layers = 2;
+const layer_ball = 0;
+const layer_racket = 1;
+
+class layermap {
+	constructor(n) {
+		this.bg = {'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 1.0}; // 불투명 백색 RGBA
+		this.layers = [];
+		this.n = n;
+		for(var i = 0; i < this.n; i++) {
+			var plane = [];
+			for(var x = 0; x <= get_max_x(); x++) {
+				var yl = [];
+				for(var y = 0; y <= get_max_y; y++) {
+					var px = {'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 0.0}; // 투명 백색 RGBA
+					yl.push(px);
+				}
+				plane.push(yl);
+			}
+			this.layers.push(plane);
+		}
+	}
+	recalc(x, y) {
+		var r = 1.0, g = 1.0, b = 1.0; // 배경 백색
+		for(var i = 0; i < this.n; i++) {
+			var a = this.layers[i][x][y]["a"];
+			r = this.layers[i][x][y]["r"] * a + r * (1 - a);
+			g = this.layers[i][x][y]["r"] * a + g * (1 - a);
+			b = this.layers[i][x][y]["r"] * a + b * (1 - a);
+		}
+		var rs = (round(r * 255)).toString(16);
+		var gs = (round(g * 255)).toString(16);
+		var bs = (round(b * 255)).toString(16);
+		if(rs.length != 2) rs = "0".repeat(2 - rs.length) + rs;
+		if(gs.length != 2) gs = "0".repeat(2 - gs.length) + gs;
+		if(bs.length != 2) bs = "0".repeat(2 - bs.length) + bs;
+		set_color("#" + rs + gs + bs);
+	}
+	setcolor(l, x, y, r, g, b, a) {
+		var px = this.layers[l][x][y];
+		px["r"] = r;
+		px["g"] = g;
+		px["b"] = b;
+		px["a"] = a;
+		this.recalc(x, y);
+	}
+}
+
+var lmap = new layermap(layers);
 
 // FROM HERE
 /**
@@ -38,7 +88,7 @@ function hsvToRgb(h, s, v) {
     case 5: r = v, g = p, b = q; break;
   }
 
-  return [ r * 255, g * 255, b * 255 ];
+  return [r, g, b];
 }
 // TO HERE
 // https://gist.github.com/mjackson/5311256#file-color-conversion-algorithms-js-L101 Line 108
@@ -49,22 +99,17 @@ function hsvToRgb(h, s, v) {
 // (c) 2021 Penta0308
 
 function domove(x, y, c, v) {
+	space_jump(y, x);
 	var s = round((1 - v) * 5);
-	change_speed(49);
-	for(i = 0; i < s; i++)
+	//change_speed(49);
+	/*for(i = 0; i < s; i++)
 		for(q = 0; q < 4; q++)
 			turn_left(); // 시간 지연용 제자리 돌기
-	change_speed(-1);
+			*/
+	//change_speed(-1);
 	var color = hsvToRgb((((c * 3) % 360) / 360.0), 0.7 - (1.0 - v) * 0.7, 0.9 + (1.0 - v) * 0.1);
-	var r = (round(color[0])).toString(16);
-	var g = (round(color[1])).toString(16);
-	var b = (round(color[2])).toString(16);
-	if(r.length != 2) r = "0".repeat(2 - r.length) + r;
-	if(g.length != 2) g = "0".repeat(2 - g.length) + g;
-	if(b.length != 2) b = "0".repeat(2 - b.length) + b;
-	if(!block_colors.includes(get_color(get_y(), get_x()))) set_color(get_y(), get_x(), "#" + r + g + b);
+	if(!block_colors.includes(get_color(get_y(), get_x()))) lmap.setcolor(layer_ball, get_y(), get_x(), color[0], color[1], color[2], 1.0);
 	//print("Vel  " + s + " v " + v);
-	space_jump(y, x);
 	//clear_move(); // 리소스 엄청 먹더라
 }
 
@@ -93,35 +138,24 @@ class racket {
 		this.x = x;
 		this.y = round(get_max_y() / 2.0);
 		this.l = 6; // 길이: 1 + 2 * l
-		this.color = color;
-		this.cmap = new Array(get_max_y() + 1);
-		this.cmap.fill("#FFFFFF");
-		this.moving = false; // 뮤텍스
-		for(var y = this.y - this.l; y <= this.y + this.l; y++) set_color(y, this.x, this.color);
+		this.color = [color.substring(1, 3).parseInt() / 255.0, color.substring(3, 5).parseInt() / 255.0, color.substring(5, 7).parseInt() / 255.0];
+		for(var y = this.y - this.l; y <= this.y + this.l; y++) lmap.setcolor(layer_racket, y, this.x, this.color[0], this.color[1], this.color[2], 1.0);
 	}
 	incr() {
-		if(this.moving) return;
-		this.moving = true;
 		if(this.y + this.l != get_max_y()) {
 			this.y += 1;
-			this.cmap[this.y + this.l] = get_color(this.y + this.l, this.x);
-			set_color(this.y + this.l, this.x, this.color);
-			set_color(this.y - this.l, this.x, this.cmap[this.y - this.l]);
+			lmap.setcolor(layer_racket, this.y + this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
+			lmap.setcolor(layer_racket, this.y - this.l, this.x, 0.0, 0.0, 0.0, 0.0); // Clear
 		}
-		this.moving = false;
 		//setTimeout(callback);
 		print("RkIc " + this.y);
 	}
 	decr() {
-		if(this.moving) return;
-		this.moving = true;
 		if(this.y - this.l != 0) {
 			this.y -= 1;
-			this.cmap[this.y - this.l] = get_color(this.y - this.l, this.x);
-			set_color(this.y - this.l, this.x, this.color);
-			set_color(this.y + this.l, this.x, this.cmap[this.y + this.l]);
+			lmap.setcolor(layer_racket, this.y - this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
+			lmap.setcolor(layer_racket, this.y + this.l, this.x, 0.0, 0.0, 0.0, 0.0);
 		}
-		this.moving = false;
 		//setTimeout(callback);
 		print("RkDc " + this.y);
 	}
@@ -155,7 +189,7 @@ class pong {
 	roll() {
 		if(this.c != 0 && this.loopid == null) this.init();
 		var setInterval = window.setInterval;
-		this.loopid = setInterval(pong2["pong1"].step, 100);
+		this.loopid = setInterval(pong2["pong1"].step, 50);
 	}
 	step() {
 		var me = pong2["pong1"];
