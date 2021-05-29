@@ -1,6 +1,6 @@
 // Add </script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script> at Top
 
-_limitcount = "_";
+_limitcnt = "_";
 
 function sleep(milliseconds) {
   var start = new Date().getTime();
