@@ -1,4 +1,7 @@
-</script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script>
+</script>
+<script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/firebase_inject.js"></script>
+<script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script>
+<script>
 
 // 0-based (map) indexing
 
@@ -94,6 +97,7 @@ class racket {
 		this.cmap = new Array(get_max_y() + 1);
 		this.cmap.fill("#FFFFFF");
 		this.moving = false; // 뮤텍스
+		for(var y = this.y - this.l; y <= this.y + this.l; y++) set_color(y, this.x, this.color);
 	}
 	incr() {
 		if(this.moving) return;
@@ -243,10 +247,10 @@ class pong {
 var pong1 = new pong(crashwall, crashblock);
 var pong2 = {"pong1": pong1};
 
-press_key("space", "pong2[\"pong1\"].roll()");
-press_key("w", "rk1.incr()");
-press_key("s", "rk1.decr()");
-press_key("i", "rk2.incr()");
-press_key("k", "rk2.decr()");
-pong2["pong1"].roll();
-//print("PRESS SPACE TO CONTINUE");
+press_key("b", "pong2[\"pong1\"].roll()");
+press_key("s", "rk1.incr()");
+press_key("w", "rk1.decr()");
+press_key("k", "rk2.incr()");
+press_key("i", "rk2.decr()");
+//pong2["pong1"].roll();
+print("PRESS [b] TO CONTINUE");
