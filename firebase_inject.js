@@ -37,7 +37,7 @@ function initdb() {
 
 function addleaderboard(score) {
   if(!ldb) initdb();
-  ldb.set({
+  ldb.add({
       id: _userid,
       name: _username,
       at: firebase.firestore.Timestamp.now(),
