@@ -1,5 +1,5 @@
 if(!($("#dscriptarea").length)) {
-  S("#executearea").before("<div id=\"dscriptarea\"></div>")
+  $("#executearea").before("<div id=\"dscriptarea\"></div>")
   $("#dscriptarea").append("<script src=\"https://www.gstatic.com/firebasejs/8.5.0/firebase.js\"></script>")
   // Your web app's Firebase configuration
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
