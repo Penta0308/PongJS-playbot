@@ -178,12 +178,12 @@ class pong {
 		this.brk = false;
 	}
 	init() {
-		var initangle = (Math.random() * 3 / 8 + 1 / 8 + 1 / 2 * round(Math.random())) * 2 * Math.PI;
+		var initangle = (Math.random() * 1 / 4 + 1 / 8 + 1 / 2 * round(Math.random())) * 2 * Math.PI;
 		var initv = 1.0;
 		this.ball["p"][0] = get_max_x() / 2.0;
 		this.ball["p"][1] = get_max_y() / 2.0;
-		this.ball["v"][0] = initv * Math.cos(initangle);
-		this.ball["v"][1] = initv * Math.sin(initangle);
+		this.ball["v"][0] = initv * Math.sin(initangle);
+		this.ball["v"][1] = initv * Math.cos(initangle);
 		space_jump(round(this.ball["p"][1]), round(this.ball["p"][0]))
 		print("Init " + this.ball["v"]);
 		this.c = 0;
