@@ -11,6 +11,8 @@ change_speed(-1);
 var layers = 2;
 var layer_ball = 0;
 var layer_racket = 1;
+var ballspeed = 50;
+var racketl = 2;
 
 class layermap {
 	constructor(n) {
@@ -137,7 +139,7 @@ class racket {
 	constructor(x, color) {
 		this.x = x;
 		this.y = round(get_max_y() / 2.0);
-		this.l = 6; // 길이: 1 + 2 * l
+		this.l = racketl; // 길이: 1 + 2 * l
 		this.color = [parseInt(color.substring(1, 3), 10) / 255.0, parseInt(color.substring(3, 5), 10) / 255.0, parseInt(color.substring(5, 7), 10) / 255.0];
 		for(var y = this.y - this.l; y <= this.y + this.l; y++) lmap.setcolor(layer_racket, y, this.x, this.color[0], this.color[1], this.color[2], 1.0);
 	}
@@ -152,7 +154,7 @@ class racket {
 	}
 	decr() {
 		if(this.y - this.l >= 1) {
-			lmap.setcolor(layer_racket, this.y + this.l + 1, this.x, 0.0, 0.0, 0.0, 0.0);
+			lmap.setcolor(layer_racket, this.y + this.l, this.x, 0.0, 0.0, 0.0, 0.0);
 			this.y -= 1;
 			lmap.setcolor(layer_racket, this.y - this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
 		}
@@ -176,7 +178,7 @@ class pong {
 		this.brk = false;
 	}
 	init() {
-		var initangle = Math.random() * 2 * Math.PI;
+		var initangle = (Math.random() * 3 / 8 + 1 / 8 + 1 / 2 * round(Math.random())) * 2 * Math.PI;
 		var initv = 1.0;
 		this.ball["p"][0] = get_max_x() / 2.0;
 		this.ball["p"][1] = get_max_y() / 2.0;
@@ -187,9 +189,10 @@ class pong {
 		this.c = 0;
 	}
 	roll() {
+		if(this.loopid != null) clearInterval(this.loopid);
 		if(this.c != 0 && this.loopid == null) this.init();
 		var setInterval = window.setInterval;
-		this.loopid = setInterval(pong2["pong1"].step, 50);
+		this.loopid = setInterval(pong2["pong1"].step, ballspeed);
 	}
 	step() {
 		var me = pong2["pong1"];
@@ -198,20 +201,20 @@ class pong {
 		var ty = me.ball["p"][1] + me.ball["v"][1];
 		var vt = Math.sqrt(me.ball["v"][0]*me.ball["v"][0] + me.ball["v"][1]*me.ball["v"][1]);
 		var crashdir = 5;
-		if(tx > get_max_x()) {
+		if(round(tx) > get_max_x()) {
 			tx = 2.0 * get_max_x() - tx;
 			me.ball["v"][0] *= -1;
 			crashdir += +1;
-		} else if(tx < 0.0) {
+		} else if(round(tx) < 0.0) {
 			tx = -tx;
 			me.ball["v"][0] *= -1;
 			crashdir += -1;
 		}
-		if(ty > get_max_y()) {
+		if(round(ty) > get_max_y()) {
 			ty = 2.0 * get_max_y() - ty;
 			me.ball["v"][1] *= -1;
 			crashdir += -3;
-		} else if(ty < 0.0) {
+		} else if(round(ty) < 0.0) {
 			ty = -ty;
 			me.ball["v"][1] *= -1;
 			crashdir += +3;
