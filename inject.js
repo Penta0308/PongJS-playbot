@@ -354,9 +354,9 @@ executeRobot = function() {
             _refresh = 0;
         } else {
             if (!_running) {
-                //if (!_refresh) {
+                if (!_refresh) {
                     refreshRobot();
-                //}
+                }
                 clearAllCmd();
                 running_on();
                 close_editWall();
