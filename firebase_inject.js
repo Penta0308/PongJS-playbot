@@ -1,3 +1,5 @@
+var ldb = undefined;
+
 if(!($("#dscriptarea").length)) {
   $("#executearea").before("<div id=\"dscriptarea\"></div>");
   var script = document.createElement("script");
@@ -9,6 +11,9 @@ if(!($("#dscriptarea").length)) {
   $("#dscriptarea")[0].appendChild(script);
   script.src = "https://www.gstatic.com/firebasejs/8.5.0/firebase-firestore.js";
   $("#dscriptarea")[0].appendChild(script);
+}
+
+function initdb() {
   // Your web app's Firebase configuration
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   var firebaseConfig = {
@@ -24,10 +29,11 @@ if(!($("#dscriptarea").length)) {
   firebase.initializeApp(firebaseConfig);
   firebase.analytics();
   var db = firebase.firestore();
-  var ldb = db.collection("leaderboard");
+  ldb = db.collection("leaderboard");
 }
 
 function addleaderboard(score) {
+  if(!ldb) initdb();
   ldb.set({
       id: _userid,
       name: _username,
@@ -41,6 +47,7 @@ function addleaderboard(score) {
 }
 
 function getleaderboard() {
+  if(!ldb) initdb();
   ldb.orderBy("score", "desc").limit(5).get()
     .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
