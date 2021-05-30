@@ -1,6 +1,7 @@
 </script>
 <script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/firebase_inject.js"></script>
 <script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
 <script>
 
 // 0-based 좌표계
@@ -11,8 +12,76 @@ change_speed(-1);
 var layers = 2;
 var layer_ball = 0;
 var layer_racket = 1;
-var ballspeed = 50;
-var racketl = 2;
+var ballspeed = 80;
+var racketl = 3;
+var learningRate = 0.001;
+
+class ai {
+	constructor() {
+		print("Starting Ai...");
+		this.model = tf.sequential();
+		this.model.add(tf.layers.dense({units: 128, inputShape: [6]})); //input is a 1x8
+		this.model.add(tf.layers.dense({units: 256, inputShape: [128]}));
+		this.model.add(tf.layers.dense({units: 256, inputShape: [256]}));
+		this.model.add(tf.layers.dense({units: 3, inputShape: [256]})); //returns a 1x3
+		this.optimizer = tf.train.adam(learningRate);
+		this.model.compile({loss: 'meanSquaredError', optimizer: this.optimizer});
+		this.previous_data = null;
+		this.training_data = [[], []];
+		this.last_data_object = null;
+		this.reset();
+	}
+	save_win() {
+		this.training_data[1][this.training_data[1].length - 1] = +1.0;
+		this.train();
+		this.reset();
+	}
+	save_lose() {
+		this.training_data[1][this.training_data[1].length - 1] = -1.0;
+		this.train();
+		this.reset();
+	}
+	save_data(computerx, ballx, bally) {
+		var data_xs = [computerx, ballx, bally];
+		if(this.previous_data == null) this.last_data_object = [...data_xs];
+		else this.last_data_object = [...this.previous_data, ...data_xs];
+		this.training_data[0].push(this.last_data_object);
+		this.training_data[1].push(0.0);
+		this.previous_data = data_xs;
+	}
+	reset() {
+		this.previous_data = null;
+		this.training_data = [[], []];
+	}
+	train() {
+		if(!this.training_data.length){
+			console.log("Nothing to Train");
+			return;
+		}
+		var data_xs = this.training_data[0];
+		var data_ys = this.training_data[1];
+		
+		const xs = tf.tensor(data_xs);
+		const ys = tf.tensor(data_ys);
+
+		(async function() {
+			console.log('Training');
+			let result = await model.fit(xs, ys);
+			console.log(result);
+		} ());
+		console.log('Trained');
+	}
+	predict_move() {
+		console.log('Predicting');
+		if(this.last_data_object != null) {
+			//use this.last_data_object for input data
+			//do prediction here
+			//return -1/0/1
+			prediction = model.predict(tf.tensor([this.last_data_object]));
+			return tf.argMax(prediction, 1).dataSync() - 1;
+		}
+	}
+}
 
 class layermap {
 	constructor(n) {
@@ -96,9 +165,10 @@ function hsvToRgb(h, s, v) {
 // https://gist.github.com/mjackson/5311256#file-color-conversion-algorithms-js-L101 Line 108
 
 
-
 // FROM HERE
 // (c) 2021 Penta0308
+
+var ai1 = new ai();
 
 function domove(x, y, c, v) {
 	space_jump(y, x);
@@ -126,8 +196,10 @@ function crashwall(ball, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
 		return 1;
+		ai1.save_lose();
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
 		return 2;
+		ai1.save_win();
 	} else return -1;
 }
 function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
@@ -201,6 +273,7 @@ class pong {
 		var ty = me.ball["p"][1] + me.ball["v"][1];
 		var vt = Math.sqrt(me.ball["v"][0]*me.ball["v"][0] + me.ball["v"][1]*me.ball["v"][1]);
 		var crashdir = 5;
+		ai1.save_data(rk1.x, me.ball["p"][0], me.ball["p"][1]);
 		if(round(tx) > get_max_x()) {
 			tx = 2.0 * get_max_x() - tx;
 			me.ball["v"][0] *= -1;
@@ -289,5 +362,6 @@ press_key("s", "rk1.incr()");
 press_key("w", "rk1.decr()");
 press_key("k", "rk2.incr()");
 press_key("i", "rk2.decr()");
+button("pongjs-button-predict", "Predict", "print('AIPr ' + ai1.predict())");
 //pong2["pong1"].roll();
 print("PRESS [b] TO CONTINUE");
