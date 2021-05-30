@@ -6,24 +6,23 @@
 
 // 0-based 좌표계
 
-var block_colors = ["#010101", "#020202"];
+const block_colors = ["#010101", "#020202"];
 change_speed(-1);
 
-var layers = 2;
-var layer_ball = 0;
-var layer_racket = 1;
-var ballspeed = 80;
+const layers = 2;
+const layer_ball = 0;
+const layer_racket = 1;
+const ballspeed = 60;
 var racketl = 3;
-var learningRate = 0.001;
+const learningRate = 0.001;
 
 class ai {
 	constructor() {
 		print("Starting Ai...");
 		this.model = tf.sequential();
-		this.model.add(tf.layers.dense({units: 128, inputShape: [6]})); //input is a 1x8
-		this.model.add(tf.layers.dense({units: 256, inputShape: [128]}));
-		this.model.add(tf.layers.dense({units: 256, inputShape: [256]}));
-		this.model.add(tf.layers.dense({units: 3, inputShape: [256]})); //returns a 1x3
+		this.model.add(tf.layers.dense({units: 64, inputShape: [8]})); //input is a 1x8
+		this.model.add(tf.layers.dense({units: 64, inputShape: [64]}));
+		this.model.add(tf.layers.dense({units: 3, inputShape: [64]})); //returns a 1x3
 		this.optimizer = tf.train.adam(learningRate);
 		this.model.compile({loss: 'meanSquaredError', optimizer: this.optimizer});
 		this.previous_data = null;
@@ -32,21 +31,25 @@ class ai {
 		this.reset();
 	}
 	save_win() {
-		this.training_data[1][this.training_data[1].length - 1] = +1.0;
+		//this.training_data[1][this.training_data[1].length - 1] = [1.0, 0.0, 0.0];
 		this.train();
-		this.reset();
 	}
 	save_lose() {
-		this.training_data[1][this.training_data[1].length - 1] = -1.0;
+		//this.training_data[1][this.training_data[1].length - 1] = [-1.0];
 		this.train();
-		this.reset();
 	}
-	save_data(computerx, ballx, bally) {
-		var data_xs = [computerx, ballx, bally];
-		if(this.previous_data == null) this.last_data_object = [...data_xs];
-		else this.last_data_object = [...this.previous_data, ...data_xs];
+	save_data(humanx, computerx, ballx, bally) {
+		var data_xs = [humanx, computerx, ballx, bally];
+		if(this.previous_data == null) {
+			this.last_data_object = [data_xs];
+			this.previous_data = data_xs;
+			return;
+		}
+		this.last_data_object = [...this.previous_data, ...data_xs];
 		this.training_data[0].push(this.last_data_object);
-		this.training_data[1].push(0.0);
+		if(this.previous_data[0] > humanx) this.training_data[1].push([0.0, 0.0, 1.0]);
+		else if(this.previous_data[0] < humanx) this.training_data[1].push([1.0, 0.0, 0.0]);
+		else this.training_data[1].push([0.0, 1.0, 0.0]);
 		this.previous_data = data_xs;
 	}
 	reset() {
@@ -58,26 +61,24 @@ class ai {
 			console.log("Nothing to Train");
 			return;
 		}
-		var data_xs = this.training_data[0];
-		var data_ys = this.training_data[1];
 		
-		const xs = tf.tensor(data_xs);
-		const ys = tf.tensor(data_ys);
+		const xs = tf.tensor(this.training_data[0]);
+		const ys = tf.tensor(this.training_data[1]);
 
-		(async function() {
-			console.log('Training');
-			let result = await model.fit(xs, ys);
-			console.log(result);
-		} ());
-		console.log('Trained');
+		const aitr = async function(me) {
+			let result = await me.model.fit(xs, ys);
+			print("AiTr");
+			me.reset();
+		};
+		aitr(this);
 	}
 	pred() {
-		console.log('Predicting');
+		console.log("Predicting");
 		if(this.last_data_object != null) {
 			//use this.last_data_object for input data
 			//do prediction here
 			//return -1/0/1
-			prediction = model.predict(tf.tensor([this.last_data_object]));
+			var prediction = this.model.predict(tf.tensor([this.last_data_object]));
 			return tf.argMax(prediction, 1).dataSync() - 1;
 		}
 	}
@@ -168,7 +169,7 @@ function hsvToRgb(h, s, v) {
 // FROM HERE
 // (c) 2021 Penta0308
 
-if (typeof ai1 !== typeof undefined) console.log("Using Ai...");
+if (typeof ai1 !== typeof undefined) print("Using Ai...");
 else var ai1 = new ai();
 
 function domove(x, y, c, v) {
@@ -205,6 +206,16 @@ function crashwall(ball, crashdir) { // 벽 충돌 Event Function
 }
 function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
 	print("CrsB " + ball["p"] + " " + crashdir);
+	var limy = Math.sqrt(1 - pong2["pong1"].ball["v"][0]*pong2["pong1"].ball["v"][0]);
+	if([1, 4, 7].includes(crashdir)) { // 좌측 라켓에 충돌
+		console.log("Rk1V " + rk1.vy);
+		pong2["pong1"].ball["v"][1] += + rk1.vy * 0.2;
+	} else if([3, 6, 9].includes(crashdir)) { // 우측 라켓에 충돌
+		console.log("Rk2V " + rk2.vy);
+		pong2["pong1"].ball["v"][1] += rk2.vy * 0.2;
+	}
+	if(pong2["pong1"].ball["v"][1] < -1.0 * limy) pong2["pong1"].ball["v"][1] = -1.0 * limy;
+	else if(pong2["pong1"].ball["v"][1] > +1.0 * limy) pong2["pong1"].ball["v"][1] = +1.0 * limy;
 	return -1;
 }
 
@@ -213,6 +224,7 @@ class racket {
 		this.x = x;
 		this.y = round(get_max_y() / 2.0);
 		this.l = racketl; // 길이: 1 + 2 * l
+		this.vy = 0.0;
 		this.color = [parseInt(color.substring(1, 3), 10) / 255.0, parseInt(color.substring(3, 5), 10) / 255.0, parseInt(color.substring(5, 7), 10) / 255.0];
 		for(var y = this.y - this.l; y <= this.y + this.l; y++) lmap.setcolor(layer_racket, y, this.x, this.color[0], this.color[1], this.color[2], 1.0);
 	}
@@ -220,6 +232,7 @@ class racket {
 		if(this.y + this.l <= get_max_y() - 1) {
 			lmap.setcolor(layer_racket, this.y - this.l, this.x, 0.0, 0.0, 0.0, 0.0); // Clear
 			this.y += 1;
+			this.vy = Math.min(this.vy + 0.2, +1.0);
 			lmap.setcolor(layer_racket, this.y + this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
 		}
 		//setTimeout(callback);
@@ -229,6 +242,7 @@ class racket {
 		if(this.y - this.l >= 1) {
 			lmap.setcolor(layer_racket, this.y + this.l, this.x, 0.0, 0.0, 0.0, 0.0);
 			this.y -= 1;
+			this.vy = Math.max(this.vy - 0.2, -1.0);
 			lmap.setcolor(layer_racket, this.y - this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
 		}
 		//setTimeout(callback);
@@ -251,8 +265,8 @@ class pong {
 		this.brk = false;
 	}
 	init() {
-		var initangle = (Math.random() * 1 / 4 + 1 / 8 + 1 / 2 * round(Math.random())) * 2 * Math.PI;
-		var initv = 1.0;
+		var initangle = (Math.random() * 1 / 4 + 1 / 8) * 2 * Math.PI;
+		var initv = 0.7;
 		this.ball["p"][0] = get_max_x() / 2.0;
 		this.ball["p"][1] = get_max_y() / 2.0;
 		this.ball["v"][0] = initv * Math.sin(initangle);
@@ -351,6 +365,14 @@ class pong {
 
 		me.ball["v"][0] *= Math.max((vt + me.contdrag) / vt, 0.0);
 		me.ball["v"][1] *= Math.max((vt + me.contdrag) / vt, 0.0); // 속도에 상관없이 일정한 감속을 부여: 수정 필요함
+		rk1.vy *= 0.8;
+		rk2.vy *= 0.8;
+		switch(ai1.pred()) {
+			case 1:
+				rk1.incr();
+			case -1:
+				rk1.decr();
+		}
 		return -1;
 	}
 }
@@ -359,10 +381,10 @@ var pong1 = new pong(crashwall, crashblock);
 var pong2 = {"pong1": pong1};
 
 press_key("b", "pong2[\"pong1\"].roll()");
-press_key("s", "rk1.incr()");
-press_key("w", "rk1.decr()");
+//press_key("s", "rk1.incr()");
+//press_key("w", "rk1.decr()");
 press_key("k", "rk2.incr()");
 press_key("i", "rk2.decr()");
-button("pongjs-button-predict", "Predict", "ai1.pred()");
+//press_key("p", "console.log('Pred ' + ai1.pred(ai1))");
 //pong2["pong1"].roll();
 print("PRESS [b] TO CONTINUE");
