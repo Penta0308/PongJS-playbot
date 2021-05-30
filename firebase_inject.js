@@ -54,8 +54,10 @@ function getleaderboard() {
   ldb.orderBy("score", "desc").limit(5).get()
     .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-            print(doc.data());
+            var l = doc.data();
+            print(l["id"] + "(" + l["name"] + ")" + "    " + l["score"])
         });
+    
     })
     .catch((error) => {
         console.log("Error getting documents: " + error);
