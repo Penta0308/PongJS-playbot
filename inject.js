@@ -476,8 +476,4 @@ window.onkeydown = function() {
 
 console.log("INJC");
 
-if(_limitcnt == 0) {
-  _limitcnt = "_";
-  _running = false;
-  $("#startBtn").click();
-}
+_limitcnt = "_";
