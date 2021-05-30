@@ -1,6 +1,5 @@
 // Add </script><script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script><script> at Top
 
-_limitcnt = "_";
 
 function sleep(milliseconds) {
   var start = new Date().getTime();
@@ -476,3 +475,9 @@ window.onkeydown = function() {
 };
 
 console.log("INJC");
+
+if(_limitcnt == 0) {
+  _limitcnt = "_";
+  $("#stopBtn").click();
+  $("#startBtn").click();
+}
