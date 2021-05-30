@@ -180,7 +180,7 @@ get_color = function(x, y) {
         }
     } else {
         if (x > _rows - 1 || x < 0 || y > _cols - 1 || y < 0) {
-            error(errorstr);
+            return "#000000";
         } else {
             row = x * 2;
             col = y * 2;
