@@ -71,7 +71,7 @@ class ai {
 		} ());
 		console.log('Trained');
 	}
-	predict_move() {
+	pred() {
 		console.log('Predicting');
 		if(this.last_data_object != null) {
 			//use this.last_data_object for input data
@@ -168,7 +168,8 @@ function hsvToRgb(h, s, v) {
 // FROM HERE
 // (c) 2021 Penta0308
 
-var ai1 = new ai();
+if (typeof ai1 !== typeof undefined) console.log("Using Ai...");
+else var ai1 = new ai();
 
 function domove(x, y, c, v) {
 	space_jump(y, x);
@@ -195,11 +196,11 @@ function set_direction(d) {
 function crashwall(ball, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
-		return 1;
 		ai1.save_lose();
+		return 1;
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
-		return 2;
 		ai1.save_win();
+		return 2;
 	} else return -1;
 }
 function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
@@ -222,7 +223,7 @@ class racket {
 			lmap.setcolor(layer_racket, this.y + this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
 		}
 		//setTimeout(callback);
-		print("RkIc " + this.y);
+		//print("RkIc " + this.y);
 	}
 	decr() {
 		if(this.y - this.l >= 1) {
@@ -231,7 +232,7 @@ class racket {
 			lmap.setcolor(layer_racket, this.y - this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
 		}
 		//setTimeout(callback);
-		print("RkDc " + this.y);
+		//print("RkDc " + this.y);
 	}
 }
 
@@ -362,6 +363,6 @@ press_key("s", "rk1.incr()");
 press_key("w", "rk1.decr()");
 press_key("k", "rk2.incr()");
 press_key("i", "rk2.decr()");
-button("pongjs-button-predict", "Predict", "print('AIPr ' + ai1.predict())");
+button("pongjs-button-predict", "Predict", "ai1.pred()");
 //pong2["pong1"].roll();
 print("PRESS [b] TO CONTINUE");
