@@ -6,14 +6,14 @@
 
 // 0-based 좌표계
 
-const block_colors = ["#010101", "#020202"];
+const block_colors = ["#000000", "#010101", "#020202"];
 change_speed(-1);
 
 const layers = 2;
 const layer_ball = 0;
 const layer_racket = 1;
-const ballspeed = 60;
-var racketl = 3;
+const ballspeed = 70;
+var racketl = 4;
 const learningRate = 0.00001;
 
 class ai {
@@ -196,11 +196,12 @@ function set_direction(d) {
 
 function crashwall(ball, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + ball["p"] + " " + crashdir);
-	addleaderboard(pong2["pong1"].t);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
+		addleaderboard(pong2["pong1"].t);
 		ai1.save_lose();
 		return 1;
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
+		addleaderboard(pong2["pong1"].t);
 		ai1.save_win();
 		return 2;
 	} else return -1;
@@ -252,8 +253,8 @@ class racket {
 	}
 }
 
-var rk1 = new racket(1, block_colors[0]);
-var rk2 = new racket(get_max_x() - 1, block_colors[1]);
+var rk1 = new racket(1, block_colors[1]);
+var rk2 = new racket(get_max_x() - 1, block_colors[2]);
 
 class pong {
 	constructor(crashwall, crashblock) {
@@ -374,10 +375,10 @@ class pong {
 		rk2.vy *= 0.8;
 		var airk = ai1.pred();
 		switch(airk) {
-			case 1:
+			case -1:
 				rk1.incr();
 				break;
-			case -1:
+			case +1:
 				rk1.decr();
 				break;
 		}
