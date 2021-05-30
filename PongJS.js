@@ -14,15 +14,15 @@ const layer_ball = 0;
 const layer_racket = 1;
 const ballspeed = 60;
 var racketl = 3;
-const learningRate = 0.001;
+const learningRate = 0.00001;
 
 class ai {
 	constructor() {
 		print("Starting Ai...");
 		this.model = tf.sequential();
 		this.model.add(tf.layers.dense({units: 64, inputShape: [8]})); //input is a 1x8
-		this.model.add(tf.layers.dense({units: 64, inputShape: [64]}));
-		this.model.add(tf.layers.dense({units: 3, inputShape: [64]})); //returns a 1x3
+		this.model.add(tf.layers.dense({units: 64, activation: 'relu6'}));
+		this.model.add(tf.layers.dense({units: 3, activation: 'relu6'})); //returns a 1x3
 		this.optimizer = tf.train.adam(learningRate);
 		this.model.compile({loss: 'meanSquaredError', optimizer: this.optimizer});
 		this.previous_data = null;
@@ -38,8 +38,8 @@ class ai {
 		//this.training_data[1][this.training_data[1].length - 1] = [-1.0];
 		this.train();
 	}
-	save_data(humanx, computerx, ballx, bally) {
-		var data_xs = [humanx, computerx, ballx, bally];
+	save_data(humany, computery, ballx, bally) {
+		var data_xs = [humany, computery, get_max_x() - ballx, bally];
 		if(this.previous_data == null) {
 			this.last_data_object = [data_xs];
 			this.previous_data = data_xs;
@@ -47,8 +47,8 @@ class ai {
 		}
 		this.last_data_object = [...this.previous_data, ...data_xs];
 		this.training_data[0].push(this.last_data_object);
-		if(this.previous_data[0] > humanx) this.training_data[1].push([0.0, 0.0, 1.0]);
-		else if(this.previous_data[0] < humanx) this.training_data[1].push([1.0, 0.0, 0.0]);
+		if(this.previous_data[0] > humany) this.training_data[1].push([0.0, 0.0, 1.0]);
+		else if(this.previous_data[0] < humany) this.training_data[1].push([1.0, 0.0, 0.0]);
 		else this.training_data[1].push([0.0, 1.0, 0.0]);
 		this.previous_data = data_xs;
 	}
@@ -58,7 +58,7 @@ class ai {
 	}
 	train() {
 		if(!this.training_data.length){
-			console.log("Nothing to Train");
+			//console.log("Nothing to Train");
 			return;
 		}
 		
@@ -73,13 +73,13 @@ class ai {
 		aitr(this);
 	}
 	pred() {
-		console.log("Predicting");
-		if(this.last_data_object != null) {
+		//console.log("Predicting");
+		if(this.last_data_object != null && this.last_data_object.length == 8) {
 			//use this.last_data_object for input data
 			//do prediction here
 			//return -1/0/1
-			var prediction = this.model.predict(tf.tensor([this.last_data_object]));
-			return tf.argMax(prediction, 1).dataSync() - 1;
+			var pred = this.model.predict(tf.tensor([this.last_data_object]));
+			return tf.argMax(pred, 1).dataSync() - 1;
 		}
 	}
 }
@@ -196,6 +196,7 @@ function set_direction(d) {
 
 function crashwall(ball, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + ball["p"] + " " + crashdir);
+	addleaderboard(pong2["pong1"].t);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
 		ai1.save_lose();
 		return 1;
@@ -213,6 +214,7 @@ function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
 	} else if([3, 6, 9].includes(crashdir)) { // 우측 라켓에 충돌
 		console.log("Rk2V " + rk2.vy);
 		pong2["pong1"].ball["v"][1] += rk2.vy * 0.2;
+		pong2["pong1"].t += 1;
 	}
 	if(pong2["pong1"].ball["v"][1] < -1.0 * limy) pong2["pong1"].ball["v"][1] = -1.0 * limy;
 	else if(pong2["pong1"].ball["v"][1] > +1.0 * limy) pong2["pong1"].ball["v"][1] = +1.0 * limy;
@@ -263,6 +265,7 @@ class pong {
 		this.init();
 		this.loopid = null;
 		this.brk = false;
+		this.t = 0;
 	}
 	init() {
 		var initangle = (Math.random() * 1 / 4 + 1 / 8) * 2 * Math.PI;
@@ -274,6 +277,8 @@ class pong {
 		space_jump(round(this.ball["p"][1]), round(this.ball["p"][0]))
 		print("Init " + this.ball["v"]);
 		this.c = 0;
+		this.t = 0;
+		ai1.reset();
 	}
 	roll() {
 		if(this.loopid != null) clearInterval(this.loopid);
@@ -288,7 +293,7 @@ class pong {
 		var ty = me.ball["p"][1] + me.ball["v"][1];
 		var vt = Math.sqrt(me.ball["v"][0]*me.ball["v"][0] + me.ball["v"][1]*me.ball["v"][1]);
 		var crashdir = 5;
-		ai1.save_data(rk1.x, me.ball["p"][0], me.ball["p"][1]);
+		ai1.save_data(rk2.y, rk1.y, me.ball["p"][0], me.ball["p"][1]);
 		if(round(tx) > get_max_x()) {
 			tx = 2.0 * get_max_x() - tx;
 			me.ball["v"][0] *= -1;
@@ -367,11 +372,14 @@ class pong {
 		me.ball["v"][1] *= Math.max((vt + me.contdrag) / vt, 0.0); // 속도에 상관없이 일정한 감속을 부여: 수정 필요함
 		rk1.vy *= 0.8;
 		rk2.vy *= 0.8;
-		switch(ai1.pred()) {
+		var airk = ai1.pred();
+		switch(airk) {
 			case 1:
 				rk1.incr();
+				break;
 			case -1:
 				rk1.decr();
+				break;
 		}
 		return -1;
 	}
@@ -386,5 +394,6 @@ press_key("b", "pong2[\"pong1\"].roll()");
 press_key("k", "rk2.incr()");
 press_key("i", "rk2.decr()");
 //press_key("p", "console.log('Pred ' + ai1.pred(ai1))");
+press_key("l", "getleaderboard()");
 //pong2["pong1"].roll();
 print("PRESS [b] TO CONTINUE");
