@@ -478,6 +478,6 @@ console.log("INJC");
 
 if(_limitcnt == 0) {
   _limitcnt = "_";
-  $("#stopBtn").click();
+  _running = false;
   $("#startBtn").click();
 }
