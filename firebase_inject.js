@@ -54,8 +54,7 @@ function getleaderboard() {
   ldb.orderBy("score", "desc").limit(5).get()
     .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
-            console.log(doc.id + " => " + doc.data());
+            print(doc.data());
         });
     })
     .catch((error) => {
