@@ -53,11 +53,13 @@ function getleaderboard() {
   if(!ldb) initdb();
   ldb.orderBy("score", "desc").limit(5).get()
     .then((querySnapshot) => {
+        let s = "<table><th><td>id(닉네임)</td><td>점수</td></th>";
         querySnapshot.forEach((doc) => {
             var l = doc.data();
-            print(l["id"] + "(" + l["name"] + ")" + "    " + l["score"])
+            s += "<tr><td>" + l["id"] + "(" + l["name"] + ")" + "</td><td>" + l["score"] + "</td></tr>";
         });
-    
+        s += "</table>";
+        popup(s);
     })
     .catch((error) => {
         console.log("Error getting documents: " + error);
