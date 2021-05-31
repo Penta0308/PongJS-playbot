@@ -126,10 +126,12 @@ function set_direction(d) {
 function crashwall(loop, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + loop.pong.ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
+		print("WIN  " + loop.pong.t);
 		addleaderboard(loop.pong.t);
 		loop.ai.store_lose(loop);
 		return 1;
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
+		print("LOSE " + loop.pong.t);
 		addleaderboard(loop.pong.t);
 		//loop.ai.store_win(loop);
 		return 2;
@@ -163,7 +165,7 @@ class ai {
 		this.last_data = null;
 		this.training_data = [];
 		this.training_reward = [];
-		this.training = true;
+		this.training = false;	// TODO: TURN ON THIS
 		this.reset();
 	}
 
@@ -426,3 +428,5 @@ press_key("k", "loop1.rk2.incr()");
 press_key("i", "loop1.rk2.decr()");
 press_key("l", "getleaderboard()");
 print("PRESS [b] TO CONTINUE");
+print("PRESS [i, k] TO MOVE");
+print("PRESS [l] TO VIEW LEADERBOARD");
