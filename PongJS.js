@@ -126,9 +126,9 @@ function set_direction(d) {
 function crashwall(loop, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + loop.pong.ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
-		print("WIN  " + loop.pong.t);
+		console.log("WIN  " + loop.pong.t);
 		addleaderboard(loop.pong.t);
-		loop.ai.store_lose(loop);
+		//loop.ai.store_lose(loop);
 		return 1;
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
 		print("LOSE " + loop.pong.t);
@@ -138,11 +138,11 @@ function crashwall(loop, crashdir) { // 벽 충돌 Event Function
 	} else return -1;
 }
 function crashblock(loop, crashdir) { // 블럭 충돌 Event Function
-	print("CrsB " + loop.pong.ball["p"] + " " + crashdir);
+	console.log("CrsB " + loop.pong.ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 좌측 라켓에 충돌
 		console.log("Rk1V " + loop.rk1.vy);
 		loop.pong.ball["v"][1] += + loop.rk1.vy * 0.2;
-		loop.ai.store_tick(loop);
+		//loop.ai.store_tick(loop);
 	} else if([3, 6, 9].includes(crashdir)) { // 우측 라켓에 충돌
 		console.log("Rk2V " + loop.rk2.vy);
 		loop.pong.ball["v"][1] += loop.rk2.vy * 0.2;
@@ -153,7 +153,7 @@ function crashblock(loop, crashdir) { // 블럭 충돌 Event Function
 	return -1;
 }
 
-class ai {
+/*class ai {
 	constructor() {
 		print("Starting Ai...");
 		this.model = tf.sequential();
@@ -230,7 +230,21 @@ class ai {
 		this.training_data = [];
 		this.training_reward = [];
 	}
-}
+}*/ // IDIOT
+
+class ai {
+	constructor() {
+		print("Starting Ai...");
+		this.reset();
+	}
+
+	update(loop) {
+		if(round(loop.pong.ball["p"][1]) > round(loop.rk1.y)) loop.rk1.incr();
+		else if(round(loop.pong.ball["p"][1]) < round(loop.rk1.y)) loop.rk1.decr();
+	}
+
+	reset() {}
+} // DUMMY
 
 class racket {
 	constructor(x, color) {
@@ -381,7 +395,7 @@ class pong {
 class loop {
 	constructor() {
 		this.frameloopid = null;
-		this.looplatency = 25; // 20FPS Target
+		this.looplatency = 25; // 40FPS Target
 		this.init();
 	}
 
