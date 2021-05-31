@@ -6,90 +6,13 @@
 
 // 0-based 좌표계
 
-const block_colors = ["#000000", "#202020", "#101010"];
+const block_colors = ["#000000", "#404040", "#202020"];
 //change_speed(-1);
 
 const layers = 2;
 const layer_ball = 0;
 const layer_racket = 1;
-const racketl = 4;
-//const learningRate = 0.001;
-
-/*class ai {
-	constructor() {
-		print("Starting Ai...");
-		this.model = tf.sequential();
-		this.model.add(tf.layers.dense({units: 5, inputShape: [4], activation: 'elu'}));
-		this.model.add(tf.layers.dense({units: 5, activation: 'elu'}));
-		//this.model.add(tf.layers.dense({units: 5, activation: 'elu'}));
-		this.model.add(tf.layers.dense({units: 3, activation: 'elu'}));
-		this.optimizer = tf.train.adam(learningRate);
-		this.model.compile({loss: 'meanSquaredError', optimizer: this.optimizer});
-		this.previous_data = null;
-		this.training_data = [[], []];
-		this.last_data_object = null;
-		this.reset();
-	}
-	save_win() {
-		//this.training_data[1][this.training_data[1].length - 1] = [1.0, 0.0, 0.0];
-		this.train();
-	}
-	save_lose() {
-		//this.training_data[1][this.training_data[1].length - 1] = [-1.0];
-		this.train();
-	}
-	save_data(humany, ballx, bally) {
-		//var data_xs = [get_max_x() - ballx, bally];
-		var data_xs = [ballx, bally];
-		if(this.previous_data == null) {
-			this.last_data_object = [data_xs];
-			this.previous_data = data_xs;
-			return;
-		}
-		this.last_data_object = [...this.previous_data, ...data_xs];
-		this.training_data[0].push(this.last_data_object);
-		//if(this.previous_data[1] > humany) this.training_data[1].push([0.0, 0.0, 1.0]);
-		//else if(this.previous_data[1] < humany) this.training_data[1].push([1.0, 0.0, 0.0]);
-		//else this.training_data[1].push([0.0, 1.0, 0.0]);
-		var ta = new Array(get_max_y());
-		ta.fill(0.0);
-		ta[round([humany])] = 1.0;
-		this.training_data[1].push(ta);
-		this.previous_data = data_xs;
-	}
-	reset() {
-		this.previous_data = null;
-		this.training_data = [[], []];
-	}
-	train() {
-		if(!this.training_data.length){
-			//console.log("Nothing to Train");
-			return;
-		}
-		
-		const xs = tf.tensor(this.training_data[0]);
-		const ys = tf.tensor(this.training_data[1]);
-
-		const aitr = async function(me) {
-			let result = await me.model.fit(xs, ys);
-			print("AiTr");
-			me.reset();
-		};
-		aitr(this);
-	}
-	pred() {
-		//console.log("Predicting");
-		if(this.last_data_object != null && this.last_data_object.length === 4) {
-			var t = new Array(4);
-			t[0] = get_max_x() - this.last_data_object[0];
-			t[2] = get_max_x() - this.last_data_object[2];
-			t[1] = this.last_data_object[1];
-			t[3] = this.last_data_object[3];
-			var pred = this.model.predict(tf.tensor([t]));
-			return tf.argMax(pred, 1).dataSync();
-		}
-	}
-}*/
+const racketl = 3;
 
 class layermap {
 	constructor(n) {
@@ -177,9 +100,6 @@ function hsvToRgb(h, s, v) {
 // FROM HERE
 // (c) 2021 Penta0308
 
-//if (typeof ai1 !== typeof undefined) print("Using Ai...");
-//else var ai1 = new ai();
-
 function domove(x, y, c, v) {
 	space_jump(y, x);
 	var s = round((1 - v) * 5);
@@ -207,11 +127,11 @@ function crashwall(loop, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + loop.pong.ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
 		addleaderboard(loop.pong.t);
-		//ai1.save_lose();
+		loop.ai.store_lose(loop);
 		return 1;
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
 		addleaderboard(loop.pong.t);
-		//ai1.save_win();
+		//loop.ai.store_win(loop);
 		return 2;
 	} else return -1;
 }
@@ -220,6 +140,7 @@ function crashblock(loop, crashdir) { // 블럭 충돌 Event Function
 	if([1, 4, 7].includes(crashdir)) { // 좌측 라켓에 충돌
 		console.log("Rk1V " + loop.rk1.vy);
 		loop.pong.ball["v"][1] += + loop.rk1.vy * 0.2;
+		loop.ai.store_tick(loop);
 	} else if([3, 6, 9].includes(crashdir)) { // 우측 라켓에 충돌
 		console.log("Rk2V " + loop.rk2.vy);
 		loop.pong.ball["v"][1] += loop.rk2.vy * 0.2;
@@ -228,6 +149,85 @@ function crashblock(loop, crashdir) { // 블럭 충돌 Event Function
 	if(loop.pong.ball["v"][1] < -1.0 * loop.pong.maxvy) loop.pong.ball["v"][1] = -1.0 * loop.pong.maxvy;
 	else if(loop.pong.ball["v"][1] > +1.0 * loop.pong.maxvy) loop.pong.ball["v"][1] = +1.0 * loop.pong.maxvy;
 	return -1;
+}
+
+class ai {
+	constructor() {
+		print("Starting Ai...");
+		this.model = tf.sequential();
+		this.model.add(tf.layers.dense({units: 5, inputShape: [4], activation: 'elu'}));
+		this.model.add(tf.layers.dense({units: 5, activation: 'elu'}));
+		this.model.add(tf.layers.dense({units: 3, activation: 'elu'}));
+		this.optimizer = tf.train.adam(0.001);
+		this.model.compile({loss: 'meanSquaredError', optimizer: this.optimizer});
+		this.last_data = null;
+		this.training_data = [];
+		this.training_reward = [];
+		this.training = true;
+		this.reset();
+	}
+
+	update(loop) {
+		let p = this.pred([[loop.pong.ball["p"][0], loop.pong.ball["p"][1], loop.rk1.y, 1]]);
+		switch(p) {
+			case 0:
+				loop.rk1.incr()
+				break;
+			case 2:
+				loop.rk2.decr();
+				break;
+		}
+		if(this.training) {
+			this.store_data(loop.pong.ball["p"][0], loop.pong.ball["p"][1], loop.rk1.y, p);
+		}
+	}
+
+	store_tick(loop) {
+		if(!this.training) return;
+		for(let i = 0; i < this.training_data.length; i++) {
+			this.training_reward[i] = +1.0 * (i / this.training_data.length);
+		}
+		this.train();
+		this.reset();
+	}
+
+	store_lose(loop) {
+		if(!this.training) return;
+		for(let i = 0; i < this.training_data.length; i++) {
+			this.training_reward[i] = -2.0 * (i / this.training_data.length);
+		}
+		this.train();
+		this.reset();
+	}
+
+	store_data(ballx, bally, computery, did) {
+		if(!this.training) return;
+		this.training_data.push([ballx, bally, computery, did]);
+		this.training_reward.push([0.0]);
+	}
+
+	train() {
+		for(let i = 0; i < this.training_data.length - 1; i++) {
+			let q = this.model.predict(this.training_data[i + 1]).dataSync();
+			let t = this.model.predict(this.training_data[i])[this.training_data[i + 1][3]].dataSync();
+			if(i === this.training_data.length - 2) {
+				q[this.training_data[3]] = this.training_reward[i];
+			} else {
+				q[this.training_data[3]] = this.training_reward[i] + 0.5 * t;
+			}
+			this.model.fit(tf.tensor([this.training_data[i]]), tf.tensor([q]), {epoch: 1});
+		}
+	}
+
+	pred(x) {
+		return tf.argMax(this.model.predict(tf.tensor(x)), 1).dataSync();
+	}
+
+	reset() {
+		this.last_data = null;
+		this.training_data = [];
+		this.training_reward = [];
+	}
 }
 
 class racket {
@@ -388,6 +388,7 @@ class loop {
 		this.rk1 = new racket(1, block_colors[1]); // Ai-Controlled
 		this.rk2 = new racket(get_max_x() - 1, block_colors[2]); // Human-Controlled
 		this.pong = new pong(crashwall, crashblock);
+		this.ai = new ai();
 		this.reset();
 	}
 
@@ -398,6 +399,7 @@ class loop {
 		this.frameloopid = setInterval(() => {
 			// Run
 			this.rk1.update(); this.rk2.update();
+			this.ai.update(this);
 			if(this.pong.update(this) > 0) this.stop();
 
 		}, this.looplatency); // 20 FPS Target
@@ -407,6 +409,7 @@ class loop {
 		// Reset
 		this.rk1.reset();
 		this.rk2.reset();
+		this.ai.reset();
 		this.pong.reset();
 	}
 
