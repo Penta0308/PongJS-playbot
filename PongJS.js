@@ -6,17 +6,16 @@
 
 // 0-based 좌표계
 
-const block_colors = ["#000000", "#010101", "#020202"];
-change_speed(-1);
+const block_colors = ["#000000", "#202020", "#101010"];
+//change_speed(-1);
 
 const layers = 2;
 const layer_ball = 0;
 const layer_racket = 1;
-const ballspeed = 70;
-var racketl = 4;
-const learningRate = 0.001;
+const racketl = 4;
+//const learningRate = 0.001;
 
-class ai {
+/*class ai {
 	constructor() {
 		print("Starting Ai...");
 		this.model = tf.sequential();
@@ -80,7 +79,7 @@ class ai {
 	}
 	pred() {
 		//console.log("Predicting");
-		if(this.last_data_object != null && this.last_data_object.length == 4) {
+		if(this.last_data_object != null && this.last_data_object.length === 4) {
 			var t = new Array(4);
 			t[0] = get_max_x() - this.last_data_object[0];
 			t[2] = get_max_x() - this.last_data_object[2];
@@ -90,7 +89,7 @@ class ai {
 			return tf.argMax(pred, 1).dataSync();
 		}
 	}
-}
+}*/
 
 class layermap {
 	constructor(n) {
@@ -136,7 +135,7 @@ class layermap {
 	}
 }
 
-var lmap = new layermap(layers);
+let lmap = new layermap(layers);
 
 // FROM HERE
 /**
@@ -145,10 +144,10 @@ var lmap = new layermap(layers);
  * Assumes h, s, and v are contained in the set [0, 1] and
  * returns r, g, and b in the set [0, 255].
  *
- * @param   Number  h       The hue
- * @param   Number  s       The saturation
- * @param   Number  v       The value
  * @return  Array           The RGB representation
+ * @param h
+ * @param s
+ * @param v
  */
 function hsvToRgb(h, s, v) {
   var r, g, b;
@@ -160,12 +159,12 @@ function hsvToRgb(h, s, v) {
   var t = v * (1 - (1 - f) * s);
 
   switch (i % 6) {
-    case 0: r = v, g = t, b = p; break;
-    case 1: r = q, g = v, b = p; break;
-    case 2: r = p, g = v, b = t; break;
-    case 3: r = p, g = q, b = v; break;
-    case 4: r = t, g = p, b = v; break;
-    case 5: r = v, g = p, b = q; break;
+    case 0: r = v; g = t; b = p; break;
+    case 1: r = q; g = v; b = p; break;
+    case 2: r = p; g = v; b = t; break;
+    case 3: r = p; g = q; b = v; break;
+    case 4: r = t; g = p; b = v; break;
+    case 5: r = v; g = p; b = q; break;
   }
 
   return [r, g, b];
@@ -177,8 +176,8 @@ function hsvToRgb(h, s, v) {
 // FROM HERE
 // (c) 2021 Penta0308
 
-if (typeof ai1 !== typeof undefined) print("Using Ai...");
-else var ai1 = new ai();
+//if (typeof ai1 !== typeof undefined) print("Using Ai...");
+//else var ai1 = new ai();
 
 function domove(x, y, c, v) {
 	space_jump(y, x);
@@ -205,64 +204,68 @@ function set_direction(d) {
 function crashwall(ball, crashdir) { // 벽 충돌 Event Function
 	print("CrsW " + ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
-		addleaderboard(pong2["pong1"].t);
+		addleaderboard(pong1.t);
 		ai1.save_lose();
 		return 1;
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
-		addleaderboard(pong2["pong1"].t);
+		addleaderboard(pong1.t);
 		ai1.save_win();
 		return 2;
 	} else return -1;
 }
 function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
 	print("CrsB " + ball["p"] + " " + crashdir);
-	var limy = Math.sqrt(1 - pong2["pong1"].ball["v"][0]*pong2["pong1"].ball["v"][0]);
+	var limy = Math.sqrt(1 - pong1.ball["v"][0]*pong1.ball["v"][0]);
 	if([1, 4, 7].includes(crashdir)) { // 좌측 라켓에 충돌
 		console.log("Rk1V " + rk1.vy);
-		pong2["pong1"].ball["v"][1] += + rk1.vy * 0.2;
+		pong1.ball["v"][1] += + rk1.vy * 0.2;
 	} else if([3, 6, 9].includes(crashdir)) { // 우측 라켓에 충돌
 		console.log("Rk2V " + rk2.vy);
-		pong2["pong1"].ball["v"][1] += rk2.vy * 0.2;
-		pong2["pong1"].t += 1;
+		pong1.ball["v"][1] += rk2.vy * 0.2;
+		pong1.t += 1;
 	}
-	if(pong2["pong1"].ball["v"][1] < -1.0 * limy) pong2["pong1"].ball["v"][1] = -1.0 * limy;
-	else if(pong2["pong1"].ball["v"][1] > +1.0 * limy) pong2["pong1"].ball["v"][1] = +1.0 * limy;
+	if(pong1.ball["v"][1] < -1.0 * limy) pong1.ball["v"][1] = -1.0 * limy;
+	else if(pong1.ball["v"][1] > +1.0 * limy) pong1.ball["v"][1] = +1.0 * limy;
 	return -1;
 }
 
 class racket {
 	constructor(x, color) {
 		this.x = x;
-		this.y = round(get_max_y() / 2.0);
 		this.l = racketl; // 길이: 1 + 2 * l
-		this.vy = 0.0;
 		this.color = [parseInt(color.substring(1, 3), 10) / 255.0, parseInt(color.substring(3, 5), 10) / 255.0, parseInt(color.substring(5, 7), 10) / 255.0];
-		for(var y = this.y - this.l; y <= this.y + this.l; y++) lmap.setcolor(layer_racket, y, this.x, this.color[0], this.color[1], this.color[2], 1.0);
+		this.reset();
 	}
-	incr() {
-		if(this.y + this.l <= get_max_y() - 1) {
-			lmap.setcolor(layer_racket, this.y - this.l, this.x, 0.0, 0.0, 0.0, 0.0); // Clear
-			this.y += 1;
-			this.vy = Math.min(this.vy + 0.2, +1.0);
-			lmap.setcolor(layer_racket, this.y + this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
+	incr() { this.targetjob = +1 }
+	decr() { this.targetjob = -1 }
+	update() {
+		switch(this.targetjob) {
+			case +1:
+				if(this.y + this.l <= get_max_y() - 1) {
+					lmap.setcolor(layer_racket, this.y - this.l, this.x, 0.0, 0.0, 0.0, 0.0); // Clear
+					this.y += 1;
+					this.vy = Math.min(this.vy + 0.2, +1.0);
+					lmap.setcolor(layer_racket, this.y + this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
+				}
+				break;
+			case -1:
+				if(this.y - this.l >= 1) {
+					lmap.setcolor(layer_racket, this.y + this.l, this.x, 0.0, 0.0, 0.0, 0.0);
+					this.y -= 1;
+					this.vy = Math.max(this.vy - 0.2, -1.0);
+					lmap.setcolor(layer_racket, this.y - this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
+				}
+				break;
 		}
-		//setTimeout(callback);
-		//print("RkIc " + this.y);
+		this.targetjob = 0;
+		this.vy *= 0.8;
 	}
-	decr() {
-		if(this.y - this.l >= 1) {
-			lmap.setcolor(layer_racket, this.y + this.l, this.x, 0.0, 0.0, 0.0, 0.0);
-			this.y -= 1;
-			this.vy = Math.max(this.vy - 0.2, -1.0);
-			lmap.setcolor(layer_racket, this.y - this.l, this.x, this.color[0], this.color[1], this.color[2], 1.0);
-		}
-		//setTimeout(callback);
-		//print("RkDc " + this.y);
+	reset() {
+		this.targetjob = 0;
+		this.vy = 0.0;
+		this.y = round(get_max_y() / 2.0);
 	}
 }
-
-var rk1 = new racket(1, block_colors[1]);
-var rk2 = new racket(get_max_x() - 1, block_colors[2]);
 
 class pong {
 	constructor(crashwall, crashblock) {
@@ -271,85 +274,77 @@ class pong {
 		this.crashblock = crashblock;
 		//this.contdrag = -0.005;
 		this.contdrag = 0.0;
-		this.init();
-		this.loopid = null;
+		this.reset();
 		this.brk = false;
 		this.t = 0;
 	}
-	init() {
-		var initangle = (Math.random() * 1 / 4 + 1 / 8) * 2 * Math.PI;
-		var initv = 0.7;
+	reset() {
+		var initangle = (Math.random() / 4 + 1 / 8) * 2 * Math.PI;
 		this.ball["p"][0] = get_max_x() / 2.0;
 		this.ball["p"][1] = get_max_y() / 2.0;
-		this.ball["v"][0] = initv * Math.sin(initangle);
-		this.ball["v"][1] = initv * Math.cos(initangle);
+		this.ball["v"][0] = 0.4; // Init Vel-X
+		this.maxvy = Math.sqrt(1 - this.ball["v"][0]*this.ball["v"][0]);
+		this.ball["v"][1] = (2 * Math.random() - 1.0) * this.maxvy; // Init Vel-Y
 		space_jump(round(this.ball["p"][1]), round(this.ball["p"][0]))
 		print("Init " + this.ball["v"]);
 		this.c = 0;
 		this.t = 0;
-		ai1.reset();
+		//ai1.reset();
 	}
-	roll() {
-		if(this.loopid != null) clearInterval(this.loopid);
-		if(this.c != 0 && this.loopid == null) this.init();
-		var setInterval = window.setInterval;
-		this.loopid = setInterval(pong2["pong1"].step, ballspeed);
-	}
-	step() {
-		var me = pong2["pong1"];
-		me.c += 1;
-		var tx = me.ball["p"][0] + me.ball["v"][0];
-		var ty = me.ball["p"][1] + me.ball["v"][1];
-		var vt = Math.sqrt(me.ball["v"][0]*me.ball["v"][0] + me.ball["v"][1]*me.ball["v"][1]);
-		var crashdir = 5;
-		ai1.save_data(rk2.y, me.ball["p"][0], me.ball["p"][1]);
+
+	update() {
+		this.c += 1;
+		let tx = this.ball["p"][0] + this.ball["v"][0];
+		let ty = this.ball["p"][1] + this.ball["v"][1];
+		let vt = Math.sqrt(this.ball["v"][0] * this.ball["v"][0] + this.ball["v"][1] * this.ball["v"][1]);
+		let crashdir = 5;
 		if(round(tx) > get_max_x()) {
 			tx = 2.0 * get_max_x() - tx;
-			me.ball["v"][0] *= -1;
+			this.ball["v"][0] *= -1;
 			crashdir += +1;
 		} else if(round(tx) < 0.0) {
 			tx = -tx;
-			me.ball["v"][0] *= -1;
+			this.ball["v"][0] *= -1;
 			crashdir += -1;
 		}
 		if(round(ty) > get_max_y()) {
 			ty = 2.0 * get_max_y() - ty;
-			me.ball["v"][1] *= -1;
+			this.ball["v"][1] *= -1;
 			crashdir += -3;
 		} else if(round(ty) < 0.0) {
 			ty = -ty;
-			me.ball["v"][1] *= -1;
+			this.ball["v"][1] *= -1;
 			crashdir += +3;
 		}
-		if(crashdir != 5) {
-			if(me.crashwall(me.ball, crashdir) > 0) {
-				clearInterval(me.loopid);
-				me.loopid = null;
+		if(crashdir !== 5) {
+			if(this.crashwall(this.ball, crashdir) > 0) {
+				clearInterval(this.loopid);
+				this.loopid = null;
 				return 3;
 			}
 		}
 
 		if(block_colors.includes(get_color(round(ty), round(tx)))) { // get_color 함수 인자의 X와 Y가 바뀌어 있더이다
-			var crashdir = 5
-			if(me.ball["v"][0] < 0.0 && block_colors.includes(get_color(get_y(), get_x() - 1))) {
+			let crashdir = 5
+			if(this.ball["v"][0] < 0.0 && block_colors.includes(get_color(get_y(), get_x() - 1))) {
 				tx = 2.0 * get_x() - tx;
-				me.ball["v"][0] *= -1;
+				this.ball["v"][0] *= -1;
 				crashdir += -1;
-			} else if(me.ball["v"][0] > 0.0 && block_colors.includes(get_color(get_y(), get_x() + 1))) {
+			} else if(this.ball["v"][0] > 0.0 && block_colors.includes(get_color(get_y(), get_x() + 1))) {
 				tx = 2.0 * get_x() - tx;
-				me.ball["v"][0] *= -1;
+				this.ball["v"][0] *= -1;
 				crashdir += +1;
 			}
-			if(me.ball["v"][1] < 0.0 && block_colors.includes(get_color(get_y() - 1, get_x()))) {
+			if(this.ball["v"][1] < 0.0 && block_colors.includes(get_color(get_y() - 1, get_x()))) {
 				ty = 2.0 * get_y() - ty;
-				me.ball["v"][1] *= -1;
+				this.ball["v"][1] *= -1;
 				crashdir += +3;
-			} else if(me.ball["v"][1] > 0.0 && block_colors.includes(get_color(get_y() + 1, get_x()))) {
+			} else if(this.ball["v"][1] > 0.0 && block_colors.includes(get_color(get_y() + 1, get_x()))) {
 				ty = 2.0 * get_y() - ty;
-				me.ball["v"][1] *= -1;
+				this.ball["v"][1] *= -1;
 				crashdir += -3;
 			}
-			if(crashdir == 5) {
+			if(crashdir === 5) {
 				if(round(tx) > get_x()) {
 					if(round(ty) > get_y()) crashdir = 3;
 					else if(round(ty) < get_y()) crashdir = 9;
@@ -358,45 +353,67 @@ class pong {
 					else if(round(ty) < get_y()) crashdir = 7;
 				}
 			}
-			if(me.crashblock(me.ball, crashdir) > 0) {
-				clearInterval(me.loopid);
-				me.loopid = null;
+			if(this.crashblock(this.ball, crashdir) > 0) {
+				clearInterval(this.loopid);
+				this.loopid = null;
 				return 2;
 			}
 		}
 
-		me.ball["p"][0] = tx;
-		me.ball["p"][1] = ty;
+		this.ball["p"][0] = tx;
+		this.ball["p"][1] = ty;
 
-		domove(round(tx), round(ty), me.c, vt);
+		domove(round(tx), round(ty), this.c, vt);
 
 		if(vt <= 0.0) {
-			print("Stop " + me.ball["p"]);
-			clearInterval(me.loopid);
-			me.loopid = null;
+			print("Stop " + this.ball["p"]);
 			return 1;
 		}
 
-		me.ball["v"][0] *= Math.max((vt + me.contdrag) / vt, 0.0);
-		me.ball["v"][1] *= Math.max((vt + me.contdrag) / vt, 0.0); // 속도에 상관없이 일정한 감속을 부여: 수정 필요함
-		rk1.vy *= 0.8;
-		rk2.vy *= 0.8;
-		var airk = ai1.pred();
-		if(airk > rk1.y) rk1.incr();
-		else if(airk < rk1.y) rk1.decr();
-		return -1;
+		this.ball["v"][0] *= Math.max((vt + this.contdrag) / vt, 0.0);
+		this.ball["v"][1] *= Math.max((vt + this.contdrag) / vt, 0.0); // 속도에 상관없이 일정한 감속을 부여: 수정 필요함
 	}
 }
 
-var pong1 = new pong(crashwall, crashblock);
-var pong2 = {"pong1": pong1};
+class loop {
+	constructor() {
+		this.frameloopid = null;
+		this.looplatency = 25; // 20FPS Target
 
-press_key("b", "pong2[\"pong1\"].roll()");
-//press_key("s", "rk1.incr()");
-//press_key("w", "rk1.decr()");
-press_key("k", "rk2.incr()");
-press_key("i", "rk2.decr()");
-//press_key("p", "console.log('Pred ' + ai1.pred(ai1))");
+		// Init
+		this.rk1 = new racket(1, block_colors[1]); // Ai-Controlled
+		this.rk2 = new racket(get_max_x() - 1, block_colors[2]); // Human-Controlled
+		this.pong = new pong(crashwall, crashblock);
+
+	}
+
+	start() {
+		if(this.frameloopid != null) return;
+		const setInterval = window.setInterval;
+		this.frameloopid = setInterval(() => {
+			// Run
+			this.rk1.update();
+			this.rk2.update();
+			this.pong.update();
+
+		}, this.looplatency); // 20 FPS Target
+
+		// Reset
+		this.rk1.reset();
+		this.rk2.reset();
+		this.pong.reset();
+	}
+
+	stop() {
+		clearInterval(frameloopid);
+		this.frameloopid = null;
+	}
+}
+
+var loop1 = new loop();
+
+press_key("b", "loop1.start()");
+press_key("k", "loop1.rk2.incr()");
+press_key("i", "loop1.rk2.decr()");
 press_key("l", "getleaderboard()");
-//pong2["pong1"].roll();
 print("PRESS [b] TO CONTINUE");

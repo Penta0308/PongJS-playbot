@@ -198,8 +198,8 @@ get_color = function(x, y) {
 }
 
 clearAllCmd = function() {
-    console.log(_cmds);
-    console.log(_cmdindex);
+    //console.log(_cmds);
+    //console.log(_cmdindex);
     _cmds = 0;
     _cmdindex = 0;
     for (var i = 0; i <= _maxCmds - 1; i++) {
