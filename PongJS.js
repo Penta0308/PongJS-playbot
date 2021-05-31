@@ -1,8 +1,8 @@
-/*</script>
+</script>
 <script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/firebase_inject.js"></script>
 <script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
-<script>*/
+<script>
 
 // 0-based 좌표계
 
