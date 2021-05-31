@@ -1,8 +1,8 @@
-</script>
+/*</script>
 <script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/firebase_inject.js"></script>
 <script src="https://raw.githubusercontent.com/Penta0308/PongJS-playbot/main/inject.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
-<script>
+<script>*/
 
 // 0-based 좌표계
 
@@ -133,6 +133,7 @@ class layermap {
 		px["a"] = _a;
 		this.recalc(x, y);
 	}
+	getcolor(l, x, y) { return this.layers[l][x][y] }
 }
 
 let lmap = new layermap(layers);
@@ -195,37 +196,37 @@ function domove(x, y, c, v) {
 }
 
 function set_direction(d) {
-	if(d == 'l')      repeat("turn_left()", (6 - get_direction()) % 4);
-	else if(d == 'r') repeat("turn_left()", (4 - get_direction()) % 4);
-	else if(d == 'u') repeat("turn_left()", (5 - get_direction()) % 4);
-	else if(d == 'd') repeat("turn_left()", (7 - get_direction()) % 4);
+	if(d === 'l')      repeat("turn_left()", (6 - get_direction()) % 4);
+	else if(d === 'r') repeat("turn_left()", (4 - get_direction()) % 4);
+	else if(d === 'u') repeat("turn_left()", (5 - get_direction()) % 4);
+	else if(d === 'd') repeat("turn_left()", (7 - get_direction()) % 4);
+	else error("set_direction only takes 'l', 'r', 'u', 'd' for input #0: " + d.toString());
 }
 
-function crashwall(ball, crashdir) { // 벽 충돌 Event Function
-	print("CrsW " + ball["p"] + " " + crashdir);
+function crashwall(loop, crashdir) { // 벽 충돌 Event Function
+	print("CrsW " + loop.pong.ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 우측 승
-		addleaderboard(pong1.t);
-		ai1.save_lose();
+		addleaderboard(loop.pong.t);
+		//ai1.save_lose();
 		return 1;
 	} else if([3, 6, 9].includes(crashdir)) { // 좌측 승
-		addleaderboard(pong1.t);
-		ai1.save_win();
+		addleaderboard(loop.pong.t);
+		//ai1.save_win();
 		return 2;
 	} else return -1;
 }
-function crashblock(ball, crashdir) { // 블럭 충돌 Event Function
-	print("CrsB " + ball["p"] + " " + crashdir);
-	var limy = Math.sqrt(1 - pong1.ball["v"][0]*pong1.ball["v"][0]);
+function crashblock(loop, crashdir) { // 블럭 충돌 Event Function
+	print("CrsB " + loop.pong.ball["p"] + " " + crashdir);
 	if([1, 4, 7].includes(crashdir)) { // 좌측 라켓에 충돌
-		console.log("Rk1V " + rk1.vy);
-		pong1.ball["v"][1] += + rk1.vy * 0.2;
+		console.log("Rk1V " + loop.rk1.vy);
+		loop.pong.ball["v"][1] += + loop.rk1.vy * 0.2;
 	} else if([3, 6, 9].includes(crashdir)) { // 우측 라켓에 충돌
-		console.log("Rk2V " + rk2.vy);
-		pong1.ball["v"][1] += rk2.vy * 0.2;
-		pong1.t += 1;
+		console.log("Rk2V " + loop.rk2.vy);
+		loop.pong.ball["v"][1] += loop.rk2.vy * 0.2;
+		loop.pong.t += 1;
 	}
-	if(pong1.ball["v"][1] < -1.0 * limy) pong1.ball["v"][1] = -1.0 * limy;
-	else if(pong1.ball["v"][1] > +1.0 * limy) pong1.ball["v"][1] = +1.0 * limy;
+	if(loop.pong.ball["v"][1] < -1.0 * loop.pong.maxvy) loop.pong.ball["v"][1] = -1.0 * loop.pong.maxvy;
+	else if(loop.pong.ball["v"][1] > +1.0 * loop.pong.maxvy) loop.pong.ball["v"][1] = +1.0 * loop.pong.maxvy;
 	return -1;
 }
 
@@ -264,6 +265,12 @@ class racket {
 		this.targetjob = 0;
 		this.vy = 0.0;
 		this.y = round(get_max_y() / 2.0);
+		for(let y = 0; y <= get_max_y(); y++) {
+			if(y >= this.y - this.l && y <= this.y + this.l)
+				lmap.setcolor(layer_racket, y, this.x, this.color[0], this.color[1], this.color[2], 1.0);
+			else
+				lmap.setcolor(layer_racket, y, this.x, 1.0, 1.0, 1.0, 0.0);
+		}
 	}
 }
 
@@ -275,8 +282,6 @@ class pong {
 		//this.contdrag = -0.005;
 		this.contdrag = 0.0;
 		this.reset();
-		this.brk = false;
-		this.t = 0;
 	}
 	reset() {
 		var initangle = (Math.random() / 4 + 1 / 8) * 2 * Math.PI;
@@ -292,7 +297,7 @@ class pong {
 		//ai1.reset();
 	}
 
-	update() {
+	update(loop) {
 		this.c += 1;
 		let tx = this.ball["p"][0] + this.ball["v"][0];
 		let ty = this.ball["p"][1] + this.ball["v"][1];
@@ -317,47 +322,43 @@ class pong {
 			crashdir += +3;
 		}
 		if(crashdir !== 5) {
-			if(this.crashwall(this.ball, crashdir) > 0) {
-				clearInterval(this.loopid);
-				this.loopid = null;
+			if(this.crashwall(loop, crashdir) > 0) {
 				return 3;
 			}
 		}
 
-		if(block_colors.includes(get_color(round(ty), round(tx)))) { // get_color 함수 인자의 X와 Y가 바뀌어 있더이다
-			let crashdir = 5
-			if(this.ball["v"][0] < 0.0 && block_colors.includes(get_color(get_y(), get_x() - 1))) {
+		crashdir = 5
+		if(lmap.getcolor(layer_racket, round(ty), round(tx))["a"] > 0.0 ) {
+			if (this.ball["v"][0] < 0.0 && lmap.getcolor(layer_racket, get_y(), get_x() - 1)["a"] > 0.0) {
 				tx = 2.0 * get_x() - tx;
 				this.ball["v"][0] *= -1;
 				crashdir += -1;
-			} else if(this.ball["v"][0] > 0.0 && block_colors.includes(get_color(get_y(), get_x() + 1))) {
+			} else if (this.ball["v"][0] > 0.0 && lmap.getcolor(layer_racket, get_y(), get_x() + 1)["a"] > 0.0) {
 				tx = 2.0 * get_x() - tx;
 				this.ball["v"][0] *= -1;
 				crashdir += +1;
 			}
-			if(this.ball["v"][1] < 0.0 && block_colors.includes(get_color(get_y() - 1, get_x()))) {
+			if (this.ball["v"][1] < 0.0 && lmap.getcolor(layer_racket, get_y() - 1, get_x())["a"] > 0.0) {
 				ty = 2.0 * get_y() - ty;
 				this.ball["v"][1] *= -1;
 				crashdir += +3;
-			} else if(this.ball["v"][1] > 0.0 && block_colors.includes(get_color(get_y() + 1, get_x()))) {
+			} else if (this.ball["v"][1] > 0.0 && lmap.getcolor(layer_racket, get_y() + 1, get_x())["a"] > 0.0) {
 				ty = 2.0 * get_y() - ty;
 				this.ball["v"][1] *= -1;
 				crashdir += -3;
 			}
-			if(crashdir === 5) {
-				if(round(tx) > get_x()) {
-					if(round(ty) > get_y()) crashdir = 3;
-					else if(round(ty) < get_y()) crashdir = 9;
-				} else if(round(tx) < get_x()) {
-					if(round(ty) > get_y()) crashdir = 1;
-					else if(round(ty) < get_y()) crashdir = 7;
+			if (crashdir === 5) {
+				if (round(tx) > get_x()) {
+					if (round(ty) > get_y()) crashdir = 3;
+					else if (round(ty) < get_y()) crashdir = 9;
+				} else if (round(tx) < get_x()) {
+					if (round(ty) > get_y()) crashdir = 1;
+					else if (round(ty) < get_y()) crashdir = 7;
 				}
 			}
-			if(this.crashblock(this.ball, crashdir) > 0) {
-				clearInterval(this.loopid);
-				this.loopid = null;
-				return 2;
-			}
+		}
+		if(crashdir !== 5) {
+			if(this.crashblock(loop, crashdir) > 0) return 2;
 		}
 
 		this.ball["p"][0] = tx;
@@ -379,25 +380,30 @@ class loop {
 	constructor() {
 		this.frameloopid = null;
 		this.looplatency = 25; // 20FPS Target
+		this.init();
+	}
 
+	init() {
 		// Init
 		this.rk1 = new racket(1, block_colors[1]); // Ai-Controlled
 		this.rk2 = new racket(get_max_x() - 1, block_colors[2]); // Human-Controlled
 		this.pong = new pong(crashwall, crashblock);
-
+		this.reset();
 	}
 
 	start() {
 		if(this.frameloopid != null) return;
 		const setInterval = window.setInterval;
+		this.reset();
 		this.frameloopid = setInterval(() => {
 			// Run
-			this.rk1.update();
-			this.rk2.update();
-			this.pong.update();
+			this.rk1.update(); this.rk2.update();
+			if(this.pong.update(this) > 0) this.stop();
 
 		}, this.looplatency); // 20 FPS Target
+	}
 
+	reset() {
 		// Reset
 		this.rk1.reset();
 		this.rk2.reset();
@@ -405,7 +411,7 @@ class loop {
 	}
 
 	stop() {
-		clearInterval(frameloopid);
+		clearInterval(this.frameloopid);
 		this.frameloopid = null;
 	}
 }
