@@ -20,10 +20,10 @@ class ai {
 	constructor() {
 		print("Starting Ai...");
 		this.model = tf.sequential();
-		this.model.add(tf.layers.dense({units: 64, inputShape: [4]}));
-		this.model.add(tf.layers.dense({units: 128, activation: 'relu6'}));
-		this.model.add(tf.layers.dense({units: 128, activation: 'relu6'}));
-		this.model.add(tf.layers.dense({units: get_max_y(), activation: 'relu6'}));
+		this.model.add(tf.layers.dense({units: 5, inputShape: [4], activation: 'elu'}));
+		this.model.add(tf.layers.dense({units: 5, activation: 'elu'}));
+		//this.model.add(tf.layers.dense({units: 5, activation: 'elu'}));
+		this.model.add(tf.layers.dense({units: 3, activation: 'elu'}));
 		this.optimizer = tf.train.adam(learningRate);
 		this.model.compile({loss: 'meanSquaredError', optimizer: this.optimizer});
 		this.previous_data = null;
